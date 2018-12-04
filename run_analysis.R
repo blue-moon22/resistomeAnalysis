@@ -6,6 +6,33 @@ library(gridExtra)
 library(purrr)
 library(grid)
 
+#### Preprocessing - Merge bedtools and metaphlan2 outputs ####
+metadata_file <- "db/SAMPLES/metadata/metadata_healthy.csv"
+card_dir <- "db/CARD_DB/card-data/"
+# Merge non-subsampled mapping data
+mapping_data_filenames <- list.files("db/MAPPING_DATA/NONSUBSAMPLED", full.names = TRUE)
+output_file <- "db/MAPPING_DATA/nonsubsampled_merged.csv"
+combineBedtools(mapping_data_filenames, output_file, metadata_file, card_dir, subsampled = FALSE)
+
+# Merge subsampled saliva mapping data for percentage of ARG classes analysis
+mapping_data_filenames <- list.files("db/MAPPING_DATA/SUBSAMPLE_SALIVA", full.names = TRUE)
+output_file <- "db/MAPPING_DATA/subsampled_saliva_merged.csv"
+combineBedtools(mapping_data_filenames, output_file, metadata_file, card_dir, subsampled = TRUE)
+
+# Merge subsampled dental mapping data for percentage of ARG classes analysis
+mapping_data_filenames <- list.files("db/MAPPING_DATA/SUBSAMPLE_DENTAL", full.names = TRUE)
+output_file <- "db/MAPPING_DATA/subsampled_dental_merged.csv"
+combineBedtools(mapping_data_filenames, output_file, metadata_file, card_dir, subsampled = TRUE)
+
+# Merge subsampled mapping data for ARG richness analysis
+mapping_data_filenames <- list.files("db/MAPPING_DATA/SUBSAMPLE_ARGRICH", full.names = TRUE)
+output_file <- "db/MAPPING_DATA/subsampled_argrich_merged.csv"
+combineBedtools(mapping_data_filenames, output_file, metadata_file, card_dir, subsampled = TRUE)
+
+# Merge metaphlan2 output
+taxa_filenames <- list.files("db/METAPHLAN/output_files", full.names = TRUE)
+combineMetaphlanSamples(taxa_filenames, output_file = "db/METAPHLAN/metaphlan.csv")
+
 #### Read mapping data ####
 # Read non-subsampled mapping data
 df_map <- readMappingData("db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)
