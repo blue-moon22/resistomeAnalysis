@@ -1,0 +1,26 @@
+Package: resistomeAnalysis
+Type: Package
+Title: Resistome Analysis
+Version: 0.1.0
+Author: Victoria Carr
+Maintainer: Victoria Carr <victoria.carr@kcl.ac.uk>
+Description: Analysis used to generate figures for publication
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    dplyr,
+    magrittr,
+    purrr,
+    reshape2,
+    ggplot2,
+    RColorBrewer,
+    grid,
+    vegan,
+    cluster,
+    ComplexHeatmap,
+    circlize,
+    dendextend,
+    DESeq2,
+    ggrepel
+RoxygenNote: 6.1.1
