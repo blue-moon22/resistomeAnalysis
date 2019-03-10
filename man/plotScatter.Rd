@@ -2,7 +2,7 @@
 % Please edit documentation in R/getProportion.R
 \name{plotScatter}
 \alias{plotScatter}
-\title{Plots a scatter plots of the porportions of samples that contain a property for each country for subsampled and non-subsampled samples}
+\title{Plots a scatter plots of the porportions of samples that contain a property for each Location for subsampled and non-subsampled samples}
 \usage{
 plotScatter(df_map_pb_comb)
 }
@@ -13,7 +13,7 @@ plotScatter(df_map_pb_comb)
 None
 }
 \description{
-Plots a scatter plots of the porportions of samples that contain a property for each country for subsampled and non-subsampled samples
+Plots a scatter plots of the porportions of samples that contain a property for each Location for subsampled and non-subsampled samples
 }
 \examples{
 df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)

@@ -12,7 +12,7 @@ plotIndividualAbundance(df_map_abundance, cols)
 \item{cols}{A character vector, named by ARG class}
 }
 \value{
-A list of ggplot object where each graph represents a country
+A list of ggplot object where each graph represents a Location
 }
 \description{
 Plot stacked bar charts of the relative abundance of total rpkm per individual, sample type and drug class
@@ -23,6 +23,6 @@ df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeA
 df_map_rel_ind <- getRelativeAbundanceIndividuals(df_map)
 cols <- brewer.pal(length(unique(df_map_rel_ind$Drug.Class.Alt)), "Set3")
 names(cols) <- unique(df_map_rel_ind$Drug.Class.Alt)
-g <- plotIndividualAbundance(df_map_rel_ind[df_map_rel_ind$Country == "HMP1",], cols)
+g <- plotIndividualAbundance(df_map_rel_ind[df_map_rel_ind$Location == "HMP1",], cols)
 
 }

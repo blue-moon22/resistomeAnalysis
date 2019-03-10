@@ -2,7 +2,7 @@
 % Please edit documentation in R/stackedBarChartsRPKM.R
 \name{plotARGClassAbundance}
 \alias{plotARGClassAbundance}
-\title{Plot stacked bar charts of the relative abundance of total rpkm per country, sample type and drug class}
+\title{Plot stacked bar charts of the relative abundance of total rpkm per Location, sample type and drug class}
 \usage{
 plotARGClassAbundance(df_map_abundance, cols)
 }
@@ -12,10 +12,10 @@ plotARGClassAbundance(df_map_abundance, cols)
 \item{cols}{A character vector, named by ARG class}
 }
 \value{
-A list of ggplot object where each graph represents a country
+A list of ggplot object where each graph represents a Location
 }
 \description{
-Plot stacked bar charts of the relative abundance of total rpkm per country, sample type and drug class
+Plot stacked bar charts of the relative abundance of total rpkm per Location, sample type and drug class
 }
 \examples{
 library(RColorBrewer)
@@ -23,6 +23,6 @@ df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeA
 df_map_rel <- getRelativeAbundance(df_map)
 cols <- brewer.pal(length(unique(df_map_rel$Drug.Class.Alt)), "Set3")
 names(cols) <- unique(df_map_rel$Drug.Class.Alt)
-g <- plotARGClassAbundance(df_map_rel[df_map_rel$Country == "HMP1",], cols)
+g <- plotARGClassAbundance(df_map_rel[df_map_rel$Location == "HMP1",], cols)
 
 }

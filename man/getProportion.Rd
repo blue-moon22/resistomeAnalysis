@@ -2,8 +2,8 @@
 % Please edit documentation in R/getProportion.R
 \name{getProportion}
 \alias{getProportion}
-\title{Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each country
-i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each country}
+\title{Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each Location
+i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each Location}
 \usage{
 getProportion(df_map, level)
 }
@@ -13,9 +13,9 @@ getProportion(df_map, level)
 \item{level}{A string of a column name e.g. Drug.Class}
 }
 \value{
-A dataframe of proportions of samples that contain a unique property for each country
+A dataframe of proportions of samples that contain a unique property for each Location
 }
 \description{
-Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each country
-i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each country
+Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each Location
+i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each Location
 }

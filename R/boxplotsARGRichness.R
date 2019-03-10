@@ -18,9 +18,9 @@ runTtest <- function(df_map_subsampled_pairs){
 
   # T-test
   p_values <- c()
-  ttest_groups <- df_map_argrich[!duplicated(paste0(df_map_argrich$Country, df_map_argrich$group)),]
+  ttest_groups <- df_map_argrich[!duplicated(paste0(df_map_argrich$Location, df_map_argrich$group)),]
   for(i in 1:nrow(ttest_groups)){
-    y <- df_map_argrich[df_map_argrich$Country == ttest_groups$Country[i] & df_map_argrich$group == ttest_groups$group[i],]
+    y <- df_map_argrich[df_map_argrich$Location == ttest_groups$Location[i] & df_map_argrich$group == ttest_groups$group[i],]
     y <- y[order(y$Sample.name),]
     type1 <- strsplit(ttest_groups$group[i], " vs. ")[[1]][1]
     type2 <- strsplit(ttest_groups$group[i], " vs. ")[[1]][2]
@@ -36,11 +36,11 @@ runTtest <- function(df_map_subsampled_pairs){
   ttest_groups$asterisk <- asterisk
 
   # Order ttest_groups
-  ttest_groups <- ttest_groups[order(ttest_groups$Country, ttest_groups$group),]
+  ttest_groups <- ttest_groups[order(ttest_groups$Location, ttest_groups$group),]
   return(ttest_groups)
 }
 
-#' Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every country
+#' Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every Location
 #'
 #' @param ttest_groups A dataframe of p-values, asterisks, countries and groups.
 #' @param df_map_subsampled_pairs A dataframe of paired samples containing group column.
@@ -63,16 +63,17 @@ plotMultipleARGRichnessGraphs <- function(ttest_groups, df_map_subsampled_pairs)
   df_map_argrich <- df_map_subsampled_pairs[!duplicated(paste0(df_map_subsampled_pairs$ID, df_map_subsampled_pairs$group)),]
   g <- list()
   for(i in 1:nrow(ttest_groups)){
-    df_map_argrich_group <- df_map_argrich[df_map_argrich$Country == ttest_groups$Country[i] & df_map_argrich$group == ttest_groups$group[i],]
+    df_map_argrich_group <- df_map_argrich[df_map_argrich$Location == ttest_groups$Location[i] & df_map_argrich$group == ttest_groups$group[i],]
     g[[i]] <- ggplot(df_map_argrich_group, aes(sample_type, arg_richness)) +
-      geom_boxplot() +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(size = 0.8) +
       theme_classic() +
       ylab("ARG Richness") +
       xlab("") +
-      ylim(c(0, max(df_map_argrich_group$arg_richness) + 0.1*max(df_map_argrich_group$arg_richness))) +
-      ggtitle(paste(ttest_groups[i,]$Country, sep = "\n")) +
+      ylim(c(0, max(df_map_argrich_group$arg_richness) + 20)) +
+      ggtitle(paste(ttest_groups[i,]$Location, sep = "\n")) +
       geom_text(data = ttest_groups[i,], aes(label=asterisk),
-                x = 1.5, y = max(df_map_argrich_group$arg_richness), size = 7,
+                x = 1.5, y = max(df_map_argrich_group$arg_richness)+10, size = 7,
                 inherit.aes = FALSE)
   }
   return(g)

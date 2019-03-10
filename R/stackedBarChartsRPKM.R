@@ -1,8 +1,8 @@
-#' Get relative abundance of total rpkm per country, sample type and drug class
+#' Get relative abundance of total rpkm per Location, sample type and drug class
 #'
 #' @param df_map A dataframe of combined non-subsampled or subsampled mapping data and metadata
 #'
-#' @return A dataframe of relative abundances of drug classes for every country and sample type
+#' @return A dataframe of relative abundances of drug classes for every Location and sample type
 #'
 #' @examples
 #' df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)
@@ -15,12 +15,12 @@ getRelativeAbundance <- function(df_map){
 
   # Get relative rpkm abundance
   df_map_rel <- df_map %>%
-    group_by(Country, Health, sample_type) %>%
+    group_by(Location, Health, sample_type) %>%
     summarise(sum_rpkm = sum(rpkm)) %>%
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(Country, sample_type, Drug.Class) %>%
+    group_by(Location, sample_type, Drug.Class) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm))
 
   # Extract most abundant ARG classes and label others as Other
@@ -35,12 +35,12 @@ getRelativeAbundance <- function(df_map){
   return(df_map_rel)
 }
 
-#' Plot stacked bar charts of the relative abundance of total rpkm per country, sample type and drug class
+#' Plot stacked bar charts of the relative abundance of total rpkm per Location, sample type and drug class
 #'
 #' @param df_map_abundance A dataframe of relative abundances created from \code{\link{getRelativeAbundance}}
 #' @param cols A character vector, named by ARG class
 #'
-#' @return A list of ggplot object where each graph represents a country
+#' @return A list of ggplot object where each graph represents a Location
 #'
 #' @examples
 #' library(RColorBrewer)
@@ -48,7 +48,7 @@ getRelativeAbundance <- function(df_map){
 #' df_map_rel <- getRelativeAbundance(df_map)
 #' cols <- brewer.pal(length(unique(df_map_rel$Drug.Class.Alt)), "Set3")
 #' names(cols) <- unique(df_map_rel$Drug.Class.Alt)
-#' g <- plotARGClassAbundance(df_map_rel[df_map_rel$Country == "HMP1",], cols)
+#' g <- plotARGClassAbundance(df_map_rel[df_map_rel$Location == "HMP1",], cols)
 #'
 #' @export
 #'
@@ -83,12 +83,12 @@ plotARGClassAbundance <- function(df_map_abundance, cols){
 getRelativeAbundanceIndividuals <- function(df_map){
   # Get top abundant classes
   df_map_rel_top <- df_map %>%
-    group_by(Country, Health, sample_type) %>%
+    group_by(Location, Health, sample_type) %>%
     summarise(sum_rpkm = sum(rpkm)) %>%
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(Country, sample_type, Drug.Class) %>%
+    group_by(Location, sample_type, Drug.Class) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm)) %>%
     group_by(Drug.Class) %>%
     summarise(total_sum_rel_rpkm = sum(sum_scale_rpkm)) %>%
@@ -97,12 +97,12 @@ getRelativeAbundanceIndividuals <- function(df_map){
 
   # Get individual relative abundance
   df_map_rel_ind <- df_map %>%
-    group_by(ID, Country, Health, sample_type) %>%
+    group_by(ID, Location, Health, sample_type) %>%
     summarise(sum_rpkm = sum(rpkm)) %>%
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(ID, Country, sample_type, Drug.Class) %>%
+    group_by(ID, Location, sample_type, Drug.Class) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm))
   Drug.Class.Alt <- df_map_rel_ind$Drug.Class
   Drug.Class.Alt[!Drug.Class.Alt %in% df_map_rel_top$Drug.Class] <- "Other"
@@ -117,7 +117,7 @@ getRelativeAbundanceIndividuals <- function(df_map){
 #' @param df_map_abundance A dataframe of relative abundances created from \code{\link{getRelativeAbundanceIndividuals}}
 #' @param cols A character vector, named by ARG class
 #'
-#' @return A list of ggplot object where each graph represents a country
+#' @return A list of ggplot object where each graph represents a Location
 #'
 #' @examples
 #' library(RColorBrewer)
@@ -125,7 +125,7 @@ getRelativeAbundanceIndividuals <- function(df_map){
 #' df_map_rel_ind <- getRelativeAbundanceIndividuals(df_map)
 #' cols <- brewer.pal(length(unique(df_map_rel_ind$Drug.Class.Alt)), "Set3")
 #' names(cols) <- unique(df_map_rel_ind$Drug.Class.Alt)
-#' g <- plotIndividualAbundance(df_map_rel_ind[df_map_rel_ind$Country == "HMP1",], cols)
+#' g <- plotIndividualAbundance(df_map_rel_ind[df_map_rel_ind$Location == "HMP1",], cols)
 #'
 #' @export
 #'

@@ -7,7 +7,7 @@
 plotRPKM(df_map_pairs_group)
 }
 \arguments{
-\item{df_map_pairs_group}{A dataframe representing one country with paired samples}
+\item{df_map_pairs_group}{A dataframe representing one Location with paired samples}
 }
 \value{
 A ggplot object

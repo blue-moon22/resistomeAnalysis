@@ -1,10 +1,10 @@
-#' Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each country
-#' i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each country
+#' Creates a dataframe that shows the proportion of samples that contain a unique property for every unique property for each Location
+#' i.e. the proportion of samples that contain an ARG class for all ARG classes found in column Drug.Class for each Location
 #'
 #' @param df_map A dataframe of combined non-subsampled or subsampled mapping data and metadata
 #' @param level A string of a column name e.g. Drug.Class
 #'
-#' @return A dataframe of proportions of samples that contain a unique property for each country
+#' @return A dataframe of proportions of samples that contain a unique property for each Location
 #'
 #' @export
 #'
@@ -12,40 +12,40 @@
 #' @importFrom reshape2 melt
 getProportion <- function(df_map, level){
 
-  # Number of samples per country
+  # Number of samples per Location
   sample_count <- df_map %>%
-    group_by(Country, ID, Health) %>%
+    group_by(Location, ID, Health) %>%
     summarise(sample_n = n())
 
-  # Number of samples in a country
-  country_count <- sample_count %>%
-    group_by(Country, Health) %>%
-    summarise(country_n = n())
-  country_count$country_health <- paste(country_count$Country, country_count$Health, sep="-")
+  # Number of samples in a Location
+  Location_count <- sample_count %>%
+    group_by(Location, Health) %>%
+    summarise(Location_n = n())
+  Location_count$Location_health <- paste(Location_count$Location, Location_count$Health, sep="-")
 
   # Get unique AMR levels e.g. class or mechanism
   level_names <- unique(unlist(sapply(df_map[[level]], function(x) strsplit(x, ";")[[1]])))
   level_names <- level_names[level_names != "N/A"] # Remove N/A level name e.g. class name
-  presence_matrix <- matrix(0, nrow = length(level_names), ncol = nrow(country_count))
+  presence_matrix <- matrix(0, nrow = length(level_names), ncol = nrow(Location_count))
 
-  # For each class name, find proportion for each country
+  # For each class name, find proportion for each Location
   for(i in 1:length(level_names)){
     if(level %in% c("Drug.Class", "Resistance.Mechanism")){
-      tmp <- df_map[grep(level_names[i], df_map[[level]]), c("ID", "Country", "Health")]
+      tmp <- df_map[grep(level_names[i], df_map[[level]]), c("ID", "Location", "Health")]
     } else {
-      tmp <- df_map[df_map[[level]] == level_names[i], c("ID", "Country", "Health")]
+      tmp <- df_map[df_map[[level]] == level_names[i], c("ID", "Location", "Health")]
     }
     tmp <- tmp[!duplicated(tmp$ID),]
-    tmp$country_health <- paste(tmp$Country, tmp$Health, sep="-")
-    for(j in 1:nrow(country_count)){
-      presence_matrix[i,j] <- sum(tmp$country_health == country_count$country_health[j]) / (country_count$country_n[country_count$country_health == country_count$country_health[j]])
+    tmp$Location_health <- paste(tmp$Location, tmp$Health, sep="-")
+    for(j in 1:nrow(Location_count)){
+      presence_matrix[i,j] <- sum(tmp$Location_health == Location_count$Location_health[j]) / (Location_count$Location_n[Location_count$Location_health == Location_count$Location_health[j]])
     }
   }
 
   # Clean presence matrix to df_map and melt
   presence_matrix <- presence_matrix*100
   presence_df_map <- as.data.frame(presence_matrix)
-  names(presence_df_map) <- country_count$country_health
+  names(presence_df_map) <- Location_count$Location_health
   rownames(presence_df_map) <- level_names
   presence_df_map <- presence_df_map[rowSums(presence_df_map) > 0,] # Remove no AMR classes
   presence_df_map$level_names <- rownames(presence_df_map)
@@ -124,7 +124,7 @@ bootstrap_CI <- function(bootstrap_percentage_output){
 #' @param sample_type A string of a sample type e.g. "saliva"
 #' @param B A numerical value of the number of types to sample in bootstrapping
 #'
-#' @return A dataframe of proportions and 95% confidence intervals of samples that contain a unique property for each country
+#' @return A dataframe of proportions and 95% confidence intervals of samples that contain a unique property for each Location
 #'
 #' @examples
 #' df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)
@@ -140,16 +140,16 @@ joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", sample_type
 
   # Get proportion of samples
   prop <- getProportion(df_map, level = level)
-  names(prop) <- c("level", "country_health", "proportion")
+  names(prop) <- c("level", "Location_health", "proportion")
 
   # Bootstrap through countries and health states
-  df_map$country_health <- paste(df_map$Country, df_map$Health, sep="-")
-  uniq_country_health <- unique(df_map$country_health)
+  df_map$Location_health <- paste(df_map$Location, df_map$Health, sep="-")
+  uniq_Location_health <- unique(df_map$Location_health)
   boot_ci <- list()
-  for(i in 1:length(uniq_country_health)){
-    df_map_filt <- df_map[df_map$country_health %in% uniq_country_health[i],]
+  for(i in 1:length(uniq_Location_health)){
+    df_map_filt <- df_map[df_map$Location_health %in% uniq_Location_health[i],]
     boot_perc <- bootstrap_percentage(df_map_filt, level, B=B)
-    boot_ci[[i]] <- data.frame(bootstrap_CI(boot_perc), country_health=uniq_country_health[i])
+    boot_ci[[i]] <- data.frame(bootstrap_CI(boot_perc), Location_health=uniq_Location_health[i])
   }
 
   # Combine CIs
@@ -159,23 +159,23 @@ joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", sample_type
   names(boot_ci_comb) <- boot_names
 
   # Join proportion and bootstrap CIs
-  boot_ci_comb$country_health <- as.character(boot_ci_comb$country_health)
-  prop$country_health <- as.character(prop$country_health)
-  df_map_join <- left_join(prop, boot_ci_comb, by = c("country_health", "level"))
+  boot_ci_comb$Location_health <- as.character(boot_ci_comb$Location_health)
+  prop$Location_health <- as.character(prop$Location_health)
+  df_map_join <- left_join(prop, boot_ci_comb, by = c("Location_health", "level"))
 
   # Get the 95% confidence interval
   df_map_join$CI_lb95 <- df_map_join$CI_lb + (df_map_join$proportion - df_map_join$CI_lb) * 0.05
   df_map_join$CI_ub95 <- df_map_join$CI_ub - (df_map_join$CI_ub - df_map_join$proportion) * 0.05
 
-  df_map_join$Country <- sapply(df_map_join$country_health, function(x) strsplit(x, "-")[[1]][1])
+  df_map_join$Location <- sapply(df_map_join$Location_health, function(x) strsplit(x, "-")[[1]][1])
 
   return(df_map_join)
 }
 
-#' Plots a bar chart of the porportions of samples that contain a property for each country
+#' Plots a bar chart of the porportions of samples that contain a property for each Location
 #'
-#' @param df_map_pb A dataframe of proportions and 95\% confidence intervals of samples that contain a unique property for each country
-#' @param colours A character vector of colours, named by country
+#' @param df_map_pb A dataframe of proportions and 95\% confidence intervals of samples that contain a unique property for each Location
+#' @param colours A character vector of colours, named by Location
 #'
 #' @return None
 #'
@@ -193,13 +193,13 @@ joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", sample_type
 #'
 #' @import ggplot2
 plotPercentages <- function(df_map_pb, colours){
-  ggplot(df_map_pb, aes(level, proportion, ymin = CI_lb95, ymax = CI_ub95, fill = Country)) +
+  ggplot(df_map_pb, aes(level, proportion, ymin = CI_lb95, ymax = CI_ub95, fill = Location)) +
     geom_bar(stat = "identity", position = "dodge", colour="black") +
     geom_errorbar(position = position_dodge()) +
     theme(axis.text.x = element_text(angle = 50, hjust = 1, size = 11),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    guides(fill=guide_legend(title="Country")) +
+    guides(fill=guide_legend(title="Location")) +
     scale_fill_manual(values = colours) +
     scale_y_continuous(limits = c(0,100), expand = c(0,0), breaks = seq(0, 100, 10))
 }
@@ -231,7 +231,7 @@ combineSubsampled <- function(df_map, df_map_sub, level, sample_type){
   return(df_map_pb_comb)
 }
 
-#' Plots a scatter plots of the porportions of samples that contain a property for each country for subsampled and non-subsampled samples
+#' Plots a scatter plots of the porportions of samples that contain a property for each Location for subsampled and non-subsampled samples
 #'
 #' @param df_map_pb_comb A dataframe with proportions and confidence intervals from non-subsampled and equivalent subsampled samples
 #'
@@ -253,18 +253,18 @@ plotScatter <- function(df_map_pb_comb){
   df_map_pb_comb <- df_map_pb_comb[df_map_pb_comb$proportion != 0,]
 
   # Add labels
-  df_map_pb_comb$class_country_health <- paste(df_map_pb_comb$class, df_map_pb_comb$country_health, sep = ": ")
-  df_map_pb_comb$country <- sapply(as.character(df_map_pb_comb$country_health), function(x) strsplit(x, "-")[[1]][1])
-  df_map_pb_comb$country_health_subsampled <- paste(df_map_pb_comb$country_health, df_map_pb_comb$subsampled, sep = ": ")
-  df_map_pb_comb$country_subsampled <- paste(df_map_pb_comb$country, df_map_pb_comb$subsampled, sep = ": ")
+  df_map_pb_comb$class_Location_health <- paste(df_map_pb_comb$class, df_map_pb_comb$Location_health, sep = ": ")
+  df_map_pb_comb$Location <- sapply(as.character(df_map_pb_comb$Location_health), function(x) strsplit(x, "-")[[1]][1])
+  df_map_pb_comb$Location_health_subsampled <- paste(df_map_pb_comb$Location_health, df_map_pb_comb$subsampled, sep = ": ")
+  df_map_pb_comb$Location_subsampled <- paste(df_map_pb_comb$Location, df_map_pb_comb$subsampled, sep = ": ")
 
   # Choose colours
-  cols <- brewer.pal(length(unique(df_map_pb_comb$country_health_subsampled)), "Paired")
+  cols <- brewer.pal(length(unique(df_map_pb_comb$Location_health_subsampled)), "Paired")
   for(i in 1:(length(cols)/2)){
     cols[(2*i-1):(2*i)] <- cols[(2*i):(2*i-1)]
   }
 
-  ggplot(df_map_pb_comb, aes(class_country_health, proportion, col = country_subsampled)) +
+  ggplot(df_map_pb_comb, aes(class_Location_health, proportion, col = Location_subsampled)) +
     geom_errorbar(aes(ymin=CI_lb95, ymax=CI_ub95), width=.7) +
     geom_point() +
     ylab("% samples") +
@@ -279,7 +279,7 @@ plotScatter <- function(df_map_pb_comb){
           axis.ticks.x=element_blank(),
           panel.grid.minor.y = element_blank(),
           panel.grid.minor.x = element_blank()) +
-    scale_color_manual("Country: non-subsampled/subsampled", values = cols) +
+    scale_color_manual("Location: non-subsampled/subsampled", values = cols) +
     scale_y_continuous(breaks = seq(0, 100, 10))
 }
 

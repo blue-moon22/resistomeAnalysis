@@ -2,7 +2,7 @@
 % Please edit documentation in R/stackedBarChartsRPKM.R
 \name{getRelativeAbundance}
 \alias{getRelativeAbundance}
-\title{Get relative abundance of total rpkm per country, sample type and drug class}
+\title{Get relative abundance of total rpkm per Location, sample type and drug class}
 \usage{
 getRelativeAbundance(df_map)
 }
@@ -10,10 +10,10 @@ getRelativeAbundance(df_map)
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
 }
 \value{
-A dataframe of relative abundances of drug classes for every country and sample type
+A dataframe of relative abundances of drug classes for every Location and sample type
 }
 \description{
-Get relative abundance of total rpkm per country, sample type and drug class
+Get relative abundance of total rpkm per Location, sample type and drug class
 }
 \examples{
 df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)

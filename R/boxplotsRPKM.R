@@ -24,8 +24,8 @@ createPairedData <- function(df_map, pair_list){
     df_map_pairs <- rbind(df_map_pairs, df_map_pair)
   }
 
-  # Order by Country and change characters in group
-  df_map_pairs <- df_map_pairs[order(df_map_pairs$Country),]
+  # Order by Location and change characters in group
+  df_map_pairs <- df_map_pairs[order(df_map_pairs$Location),]
   df_map_pairs$group <- as.character(df_map_pairs$group)
   df_map_pairs$group_mod <- gsub("vs.", "\nvs.", df_map_pairs$group)
 
@@ -34,7 +34,7 @@ createPairedData <- function(df_map, pair_list){
 
 #' Plots a box and whisker diagram between paired samples types
 #'
-#' @param df_map_pairs_group A dataframe representing one country with paired samples
+#' @param df_map_pairs_group A dataframe representing one Location with paired samples
 #'
 #' @return A ggplot object
 #'
@@ -45,7 +45,7 @@ plotRPKM <- function(df_map_pairs_group){
 
   g <- ggplot(df_map_pairs_group, aes(sample_type, rpkm_log)) +
     geom_boxplot() +
-    ggtitle(unique(df_map_pairs_group$Country)) +
+    ggtitle(unique(df_map_pairs_group$Location)) +
     theme_classic() +
     theme(strip.text.x = element_blank(),
           legend.position = "none") +
@@ -54,7 +54,7 @@ plotRPKM <- function(df_map_pairs_group){
   return(g)
 }
 
-#' Plots multiple box and whisker diagrams of total RPKM between paired sample types for every country
+#' Plots multiple box and whisker diagrams of total RPKM between paired sample types for every Location
 #'
 #' @param df_map_pairs A dataframe of paired sample types with a column named group i.e. saliva vs. stool
 #'
@@ -74,9 +74,9 @@ plotMultipleRPKM <- function(df_map_pairs){
 
   graphs <- list()
   count <- 0
-  unique_Country <- unique(df_map_pairs$Country)
-  for(i in 1:length(unique_Country)){
-    tmp <- df_map_pairs[df_map_pairs$Country == unique_Country[i],]
+  unique_Location <- unique(df_map_pairs$Location)
+  for(i in 1:length(unique_Location)){
+    tmp <- df_map_pairs[df_map_pairs$Location == unique_Location[i],]
     unique_groups <- unique(tmp$group)
     for(j in 1:length(unique_groups)){
       count <- count + 1

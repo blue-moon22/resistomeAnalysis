@@ -4,12 +4,12 @@
 \alias{plotGraph}
 \title{Plot scatter graph of proportion against DDD per 1000}
 \usage{
-plotGraph(data_merge, country, class_cols)
+plotGraph(data_merge, Location, class_cols)
 }
 \arguments{
 \item{data_merge}{A dataframe of proportions containing ARG classes and confidence intervals, and resistanceMap DDD per 1000}
 
-\item{country}{A string of a country e.g. "US"}
+\item{Location}{A string of a Location e.g. "US"}
 
 \item{class_cols}{A character vector of colours, named by ARG class}
 }

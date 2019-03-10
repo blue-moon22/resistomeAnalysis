@@ -2,15 +2,15 @@
 % Please edit documentation in R/differentialAnalysis.R
 \name{runDESeq2}
 \alias{runDESeq2}
-\title{Runs differential analysis using DESeq2 for a country between paired sample types}
+\title{Runs differential analysis using DESeq2 for a Location between paired sample types}
 \usage{
-runDESeq2(df_map, Country, compare_samples = c("stool",
+runDESeq2(df_map, Location, compare_samples = c("stool",
   "dorsum of tongue"))
 }
 \arguments{
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
 
-\item{Country}{A string of a country that is found in the Country column of df_map}
+\item{Location}{A string of a Location that is found in the Location column of df_map}
 
 \item{compare_samples}{A character vector of length two of sample types to compare}
 }
@@ -18,7 +18,7 @@ runDESeq2(df_map, Country, compare_samples = c("stool",
 A list of length two of a dataframe of DESeq2 results and a character vector of sample types compared in DESeq2
 }
 \description{
-Runs differential analysis using DESeq2 for a country between paired sample types
+Runs differential analysis using DESeq2 for a Location between paired sample types
 }
 \examples{
 df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/boxplotsRPKM.R
 \name{plotMultipleRPKM}
 \alias{plotMultipleRPKM}
-\title{Plots multiple box and whisker diagrams of total RPKM between paired sample types for every country}
+\title{Plots multiple box and whisker diagrams of total RPKM between paired sample types for every Location}
 \usage{
 plotMultipleRPKM(df_map_pairs)
 }
@@ -13,7 +13,7 @@ plotMultipleRPKM(df_map_pairs)
 A list of box and whisker ggplot objects.
 }
 \description{
-Plots multiple box and whisker diagrams of total RPKM between paired sample types for every country
+Plots multiple box and whisker diagrams of total RPKM between paired sample types for every Location
 }
 \examples{
 df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)

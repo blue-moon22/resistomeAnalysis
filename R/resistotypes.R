@@ -26,8 +26,8 @@ runPrincipleCoordinateAnalysis <- function(df_map){
   mds <- wcmdscale(dst, w=rep(1,nrow(rpkm)))
   mds <- as.data.frame(mds)
   mds$sample_type <- df_map[!(duplicated(df_map$ID)),]$sample_type
-  mds$Country <- df_map[!(duplicated(df_map$ID)),]$Country
-  mds$group <- paste(mds$sample_type, mds$Country, sep = " - ")
+  mds$Location <- df_map[!(duplicated(df_map$ID)),]$Location
+  mds$group <- paste(mds$sample_type, mds$Location, sep = " - ")
   return(mds)
 }
 
@@ -48,16 +48,8 @@ runPrincipleCoordinateAnalysis <- function(df_map){
 #' @importFrom RColorBrewer brewer.pal
 plotSampleTypes <- function(mds){
 
-  stool_cols <- brewer.pal(9, "RdPu")
-  saliva_cols <- brewer.pal(9, "YlOrRd")
-  dental_cols <- brewer.pal(9, "Blues")
-  other_cols <- brewer.pal(3, "Dark2")[1:2]
-
-  cols <- c("grey", dental_cols[8], dental_cols[6], "yellowgreen", saliva_cols[8], saliva_cols[6], saliva_cols[4], stool_cols[8], stool_cols[6], stool_cols[4])
-
   ggplot(mds, aes(V1, V2, color = group)) +
     geom_point(alpha = 0.6) +
-    scale_color_manual(name = "Sample Type - Country", values = cols) +
     xlab("PCo 1") + ylab("PCo 2") +
     theme(panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(),
@@ -86,7 +78,7 @@ plotResistotypes <- function(mds){
 
   set.seed(42)
   # Hierarchical clustering
-  dst=dist(mds[,!(names(mds) %in% c("sample_type", "Country", "group"))])
+  dst=dist(mds[,!(names(mds) %in% c("sample_type", "Location", "group"))])
   dst_hclust <- hclust(dst)
   # Silhoette analysis
   avg_sil <- numeric(20)

@@ -17,7 +17,7 @@ joinProportionAndBootstrap(df_map, level = "Drug.Class",
 \item{B}{A numerical value of the number of types to sample in bootstrapping}
 }
 \value{
-A dataframe of proportions and 95% confidence intervals of samples that contain a unique property for each country
+A dataframe of proportions and 95% confidence intervals of samples that contain a unique property for each Location
 }
 \description{
 Merges dataframes of proportion of samples containing a certain property and confidence intervals of proportions from bootstrapping samples

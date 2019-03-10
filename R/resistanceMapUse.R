@@ -1,7 +1,7 @@
 #' Plot scatter graph of proportion against DDD per 1000
 #'
 #' @param data_merge A dataframe of proportions containing ARG classes and confidence intervals, and resistanceMap DDD per 1000
-#' @param country A string of a country e.g. "US"
+#' @param Location A string of a Location e.g. "US"
 #' @param class_cols A character vector of colours, named by ARG class
 #'
 #' @return None
@@ -21,23 +21,23 @@
 #' @export
 #'
 #' @import ggplot2
-plotGraph <- function(data_merge, country, class_cols){
+plotGraph <- function(data_merge, Location, class_cols){
   shape_values <- c(1,4)
   names(shape_values) <- unique(data_merge$sample_type)
 
   # Plot graph
-  data_merge_country <- data_merge[data_merge$Country %in% country,]
-  ggplot(data_merge_country, aes(sum.DDD.Per.1000.Pop, proportion,
+  data_merge_Location <- data_merge[data_merge$Location %in% Location,]
+  ggplot(data_merge_Location, aes(sum.DDD.Per.1000.Pop, proportion,
                            ymin = CI_lb95, ymax = CI_ub95,
                            color = factor(class), shape = factor(sample_type))) +
     geom_point(size = 2) +
     theme(panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
-    geom_errorbar(aes(ymin=CI_lb95, ymax=CI_ub95), width = max(data_merge_country$sum.DDD.Per.1000.Pop)/100) +
+    geom_errorbar(aes(ymin=CI_lb95, ymax=CI_ub95), width = max(data_merge_Location$sum.DDD.Per.1000.Pop)/100) +
     xlab("Defined Daily Doses Per 1000 individuals") + ylab("% samples") +
     scale_color_manual("ARG Class", values = cols) +
     scale_shape_manual("Oral type", values = shape_values) +
-    ggtitle(country)
+    ggtitle(Location)
 }
 
 #' Read resistanceMap use data
@@ -58,7 +58,7 @@ readResistanceMapUseData <- function(filename){
   rm_use <- read.csv(filename, stringsAsFactors = FALSE)
 
   # Sum DDD by CARD class
-  rm_use_card <- rm_use %>% group_by(Country, CARD.Class) %>%
+  rm_use_card <- rm_use %>% group_by(Location, CARD.Class) %>%
     summarise(sum.DDD.Per.1000.Pop = sum(DDD.Per.1000.Pop)) %>%
     dplyr::rename(class = CARD.Class) %>%
     as.data.frame()
@@ -94,7 +94,7 @@ mergeData <- function(percentages_data_list, resistance_map_data){
   names(perc_data_all)[names(perc_data_all) == "level"] <- "class"
 
   # Join metagenomic percentages data with resistance map data
-  data_merge <- full_join(resistance_map_data, perc_data_all, by = c("Country", "class"))
+  data_merge <- full_join(resistance_map_data, perc_data_all, by = c("Location", "class"))
   data_merge <- data_merge[!is.na(data_merge$proportion),]
   data_merge <- data_merge[!is.na(data_merge$sum.DDD.Per.1000.Pop),]
   return(data_merge)

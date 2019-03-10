@@ -2,7 +2,7 @@
 % Please edit documentation in R/boxplotsARGRichness.R
 \name{plotMultipleARGRichnessGraphs}
 \alias{plotMultipleARGRichnessGraphs}
-\title{Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every country}
+\title{Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every Location}
 \usage{
 plotMultipleARGRichnessGraphs(ttest_groups, df_map_subsampled_pairs)
 }
@@ -15,7 +15,7 @@ plotMultipleARGRichnessGraphs(ttest_groups, df_map_subsampled_pairs)
 A list of box and whisker ggplot objects.
 }
 \description{
-Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every country
+Plots multiple box and whisker diagrams of the ARG richness comparison between paired sample types for every Location
 }
 \examples{
 df_map_subsampled <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/subsampled_argrich_merged.csv", without_US_duplicates = TRUE)

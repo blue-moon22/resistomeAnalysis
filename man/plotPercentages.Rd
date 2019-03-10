@@ -2,20 +2,20 @@
 % Please edit documentation in R/getProportion.R
 \name{plotPercentages}
 \alias{plotPercentages}
-\title{Plots a bar chart of the porportions of samples that contain a property for each country}
+\title{Plots a bar chart of the porportions of samples that contain a property for each Location}
 \usage{
 plotPercentages(df_map_pb, colours)
 }
 \arguments{
-\item{df_map_pb}{A dataframe of proportions and 95\% confidence intervals of samples that contain a unique property for each country}
+\item{df_map_pb}{A dataframe of proportions and 95\% confidence intervals of samples that contain a unique property for each Location}
 
-\item{colours}{A character vector of colours, named by country}
+\item{colours}{A character vector of colours, named by Location}
 }
 \value{
 None
 }
 \description{
-Plots a bar chart of the porportions of samples that contain a property for each country
+Plots a bar chart of the porportions of samples that contain a property for each Location
 }
 \examples{
 library(RColorBrewer)
