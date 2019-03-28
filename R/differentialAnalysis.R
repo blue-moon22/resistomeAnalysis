@@ -81,7 +81,7 @@ runDESeq2 <- function(df_map, Location, compare_samples = c("stool", "dorsum of 
 #' @import ggplot2
 #' @importFrom ggrepel geom_label_repel
 #' @import RColorBrewer
-plotVolcano <- function(Location_results, df_map, title){
+plotVolcano <- function(Location_results, df_map, title, class_colours){
 
   # Extract as data frame
   topT <- as.data.frame(Location_results)

@@ -38,13 +38,15 @@ readMappingData <- function(filename, without_US_duplicates = TRUE, coverage_thr
   }
 
   # Rename some of the ARGs in V1
-  gsub("ARO:3004039|Escherichia", "ARO:3004039|Escherichia_coli_emrE", df_map$V1)
-  gsub("ARO:3004043|Escherichia", "ARO:3004039|ARO:3004043|Escherichia_coli_acrA", df_map$V1)
-  gsub("ARO:3001328|Escherichia", "ARO:3001328|Escherichia_coli_mdfA", df_map$V1)
-  gsub("ARO:3004290|Escherichia", "ARO:3004290|Escherichia_coli_ampC_beta-lactamase", df_map$V1)
-  gsub("ARO:3003730|Bifidobacteria", "ARO:3003730|Bifidobacterium_ileS_conferring_resistance_to_mupirocin", df_map$V1)
-  gsub("ARO:3004041|Klebsiella", "ARO:3004041|Klebsiella_pneumoniae_acrA", df_map$V1)
-  gsub("ARO:3004122|Klebsiella", "ARO:3004122|Klebsiella_pneumoniae_OmpK37", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004039\\|Escherichia", "ARO:3004039\\|Escherichia_coli_emrE", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004043\\|Escherichia", "ARO:3004043\\|Escherichia_coli_acrA", df_map$V1)
+  df_map$V1 <- gsub("ARO:3001328\\|Escherichia", "ARO:3001328\\|Escherichia_coli_mdfA", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004290\\|Escherichia", "ARO:3004290\\|Escherichia_coli_ampC_beta-lactamase", df_map$V1)
+  df_map$V1 <- gsub("ARO:3003730\\|Bifidobacteria", "ARO:3003730\\|Bifidobacterium_ileS_conferring_resistance_to_mupirocin", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004041\\|Klebsiella", "ARO:3004041\\|Klebsiella_pneumoniae_acrA", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004122\\|Klebsiella", "ARO:3004122\\|Klebsiella_pneumoniae_OmpK37", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004454\\|Campylobacter", "ARO:3004454\\|Campylobacter_coli_chloramphenicol_acetyltransferase", df_map$V1)
+  df_map$V1 <- gsub("ARO:3004042\\|Enterobacter", "ARO:3004042\\|Enterobacter_cloacae_acrA", df_map$V1)
 
   # Get total reads per sample and ARG richness
   total_reads <- df_map %>%

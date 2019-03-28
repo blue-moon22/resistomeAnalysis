@@ -4,12 +4,13 @@
 \alias{createRPKMHeatmap}
 \title{Draws a heatmap from a dataframe of ARG abundance for every sample}
 \usage{
-createRPKMHeatmap(df_map, Cohort, col_vector, show_column_names = FALSE)
+createRPKMHeatmap(df_map, Location, col_vector,
+  show_column_names = FALSE)
 }
 \arguments{
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
 
-\item{Cohort}{A string of the study cohort e.g. "Twin"}
+\item{Location}{A string of the study Location e.g. "China"}
 
 \item{col_vector}{A character vector of colours, named by sample type}
 
@@ -27,6 +28,6 @@ library(RColorBrewer)
 df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)
 top_col <- brewer.pal(4, "Paired")
 col_vector <- c("stool" = top_col[1], "saliva" = top_col[3])
-createRPKMHeatmap(df_map, "Twin", col_vector, show_column_names = TRUE)
+createRPKMHeatmap(df_map, "China", col_vector, show_column_names = TRUE)
 
 }

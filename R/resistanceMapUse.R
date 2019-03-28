@@ -21,9 +21,7 @@
 #' @export
 #'
 #' @import ggplot2
-plotGraph <- function(data_merge, Location, class_cols){
-  shape_values <- c(1,4)
-  names(shape_values) <- unique(data_merge$sample_type)
+plotGraph <- function(data_merge, Location, class_cols, shape_values){
 
   # Plot graph
   data_merge_Location <- data_merge[data_merge$Location %in% Location,]
@@ -35,7 +33,7 @@ plotGraph <- function(data_merge, Location, class_cols){
           axis.line = element_line(colour = "black")) +
     geom_errorbar(aes(ymin=CI_lb95, ymax=CI_ub95), width = max(data_merge_Location$sum.DDD.Per.1000.Pop)/100) +
     xlab("Defined Daily Doses Per 1000 individuals") + ylab("% samples") +
-    scale_color_manual("ARG Class", values = cols) +
+    scale_color_manual("ARG Class", values = class_cols) +
     scale_shape_manual("Oral type", values = shape_values) +
     ggtitle(Location)
 }

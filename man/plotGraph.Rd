@@ -4,7 +4,7 @@
 \alias{plotGraph}
 \title{Plot scatter graph of proportion against DDD per 1000}
 \usage{
-plotGraph(data_merge, Location, class_cols)
+plotGraph(data_merge, Location, class_cols, shape_values)
 }
 \arguments{
 \item{data_merge}{A dataframe of proportions containing ARG classes and confidence intervals, and resistanceMap DDD per 1000}

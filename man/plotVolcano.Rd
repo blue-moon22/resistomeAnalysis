@@ -4,14 +4,12 @@
 \alias{plotVolcano}
 \title{Plot Volcano plots of differential analysis}
 \usage{
-plotVolcano(Location_results, df_map, sample_comp, title)
+plotVolcano(Location_results, df_map, title, class_colours)
 }
 \arguments{
 \item{Location_results}{A dataframe of DESeq2 results for one Location}
 
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
-
-\item{sample_comp}{A string of sample type comparison e.g. "saliva vs. stool"}
 
 \item{title}{A string of the Location name for title of volcano plot}
 }
