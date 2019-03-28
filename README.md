@@ -17,9 +17,10 @@
 * dendextend
 * DESeq2
 * ggrepel
+* stringr
 
 ```R
-install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "grid", "vegan", "cluster", "ComplexHeatmap", "circlize", "dendextend", "DESeq2", "ggrepel"))
+install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "grid", "vegan", "cluster", "ComplexHeatmap", "circlize", "dendextend", "DESeq2", "ggrepel", "stringr"))
 ```
 
 ### Install resistomeAnalysis package in R:
