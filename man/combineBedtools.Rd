@@ -2,15 +2,15 @@
 % Please edit documentation in R/processFiles.R
 \name{combineBedtools}
 \alias{combineBedtools}
-\title{Combines bedtools mapping data with metadata and CARD data}
+\title{Combines mapping data with metadata and CARD data}
 \usage{
 combineBedtools(filenames, output_file, metadata_file, card_dir,
   subsampled = FALSE)
 }
 \arguments{
-\item{filenames}{A character vector of bedtools filenames}
+\item{filenames}{A character vector of filenames}
 
-\item{output_file}{A string of the location of combined bedtools and metadata file}
+\item{output_file}{A string of the location of combined file}
 
 \item{metadata_file}{A string of the location of the metadata file}
 
@@ -19,7 +19,7 @@ combineBedtools(filenames, output_file, metadata_file, card_dir,
 \item{subsampled}{A boolean stating whether reads were subsampled or not before mapping to CARD}
 }
 \description{
-Combines bedtools mapping data with metadata and CARD data
+Combines mapping data with metadata and CARD data
 }
 \examples{
 

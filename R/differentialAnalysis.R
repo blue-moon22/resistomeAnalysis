@@ -15,27 +15,27 @@
 #'
 #' @importFrom reshape2 dcast
 #' @import DESeq2
-runDESeq2 <- function(df_map, Location, compare_samples = c("stool", "dorsum of tongue")){
+runDESeq2 <- function(df, Location, compare_samples = c("stool", "dorsum of tongue")){
 
   # Extract Location
-  df_map_Location <- df_map[df_map$Location == Location,]
+  df_Location <- df[df$Location == Location,]
 
   # Get sample names and samples types that contain paired samples
-  id_type_list <- sapply(compare_samples, function(x) df_map_Location$Sample.name[df_map_Location$sample_type == x])
+  id_type_list <- sapply(compare_samples, function(x) df_Location$Sample.name[df_Location$sample_type == x])
   sample_names <- Reduce(intersect, id_type_list)
-  df_map_Location <- df_map_Location[df_map_Location$Sample.name %in% sample_names,]
+  df_Location <- df_Location[df_Location$Sample.name %in% sample_names,]
 
-  df_map_Location <- df_map_Location[df_map_Location$sample_type %in% compare_samples,]
+  df_Location <- df_Location[df_Location$sample_type %in% compare_samples,]
 
   # Create count matrix
-  Location_count <- dcast(data = df_map_Location, formula = V1 ~ ID, fun.aggregate = sum, value.var = "V4")
-  arg_names <- Location_count$V1
+  Location_count <- dcast(data = df_Location, formula = ARO.Name ~ ID, fun.aggregate = sum, value.var = "V4")
+  arg_names <- Location_count$ARO.Name
   row.names(Location_count) <- arg_names
-  Location_count <- Location_count[,names(Location_count) != "V1"]
+  Location_count <- Location_count[,names(Location_count) != "ARO.Name"]
   Location_count <- as.matrix(Location_count)
 
   # Create Location sample metadata
-  Location_meta <- df_map_Location[,c("ID", "Sample.name", "sample_type")]
+  Location_meta <- df_Location[,c("ID", "Sample.name", "sample_type")]
   Location_meta <- Location_meta[!duplicated(Location_meta$ID),]
   Location_meta$sample_type <- factor(Location_meta$sample_type)
   Location_meta$Sample.name <- factor(Location_meta$Sample.name)
@@ -51,16 +51,17 @@ runDESeq2 <- function(df_map, Location, compare_samples = c("stool", "dorsum of 
   }
   dds <- DESeqDataSetFromMatrix(countData = Location_count, colData = Location_meta, design = ~ sample_type)
   dds <- dds[rowSums(counts(dds)) > 5,]
-  geoMeans = apply(counts(dds), 1, gm_mean)
-  dds = estimateSizeFactors(dds, geoMeans = geoMeans)
-  dds = DESeq(dds, fitType="local")
+  geoMeans <- apply(counts(dds), 1, gm_mean)
+  dds <- estimateSizeFactors(dds, geoMeans = geoMeans)
+  dds <- estimateDispersions(dds)
+  dds <- DESeq(dds, fitType="local")
 
   contrast_list <- resultsNames(dds)
   sample_comparisons <- c(contrast_list[length(contrast_list)-1], contrast_list[length(contrast_list)])
   sample_comp <- strsplit(sample_comparisons[2], "sample_type_")[[1]][2]
   Location_results <- results(dds, contrast=list(sample_comparisons))
 
-  return(list(results = Location_results, sample_comparison = sample_comp))
+  return(list(results = Location_results, sample_comparison = sample_comp, dds = dds))
 }
 
 #' Plot Volcano plots of differential analysis
@@ -81,7 +82,7 @@ runDESeq2 <- function(df_map, Location, compare_samples = c("stool", "dorsum of 
 #' @import ggplot2
 #' @importFrom ggrepel geom_label_repel
 #' @import RColorBrewer
-plotVolcano <- function(Location_results, df_map, title, class_colours){
+plotVolcano <- function(Location_results, df_map, title, class_colours, label_size){
 
   # Extract as data frame
   topT <- as.data.frame(Location_results)
@@ -96,9 +97,10 @@ plotVolcano <- function(Location_results, df_map, title, class_colours){
   topT <- topT[!is.na(topT$padj),]
 
   # Get class colours
-  topT$drug_class <- sapply(row.names(topT), function(x) unique(df_map$Drug.Class_mod[df_map$V1 == x]))
+  topT$drug_class <- sapply(row.names(topT), function(x) unique(df_map$Drug.Class_mod[df_map$ARO.Name == x]))
 
   # Volcano plot
+  set.seed(42)
   volcano_plot <- ggplot() +
   geom_point(data = topT[topT$padj >= 0.05 & abs(topT$log2FoldChange) <= 2,],
              aes(log2FoldChange, -log10(padj)), colour = "black", shape = 1, fill = NA) +
@@ -106,7 +108,7 @@ plotVolcano <- function(Location_results, df_map, title, class_colours){
              aes(log2FoldChange, -log10(padj), color = "red"),
              size = 2, shape = 1, fill = NA) +
   geom_label_repel(data = topT[topT$padj < 0.05 & abs(topT$log2FoldChange) > 2,],
-            aes(x=log2FoldChange, y=-log10(padj), label=ARG, fill = drug_class)) +
+            aes(x=log2FoldChange, y=-log10(padj), label=ARG, fill = drug_class), size = label_size) +
   xlim(c(-25,25)) +
   ylab("-Log10(adjusted p-value)\n") +
   theme(axis.title = element_text(size=20),

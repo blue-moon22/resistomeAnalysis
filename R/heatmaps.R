@@ -25,11 +25,11 @@
 createRPKMHeatmap <- function(df_map, Location, col_vector, show_column_names = FALSE) {
 
   # Remove antibiotic word from Drug Class
-  df_map$Drug.Class <- gsub(" antibiotic", "", df_map$Drug.Class)
-  df_map$Drug.Class <- gsub("antibiotic", "", df_map$Drug.Class)
+  df_map$Drug.Class.Efflux <- gsub(" antibiotic", "", df_map$Drug.Class.Efflux)
+  df_map$Drug.Class.Efflux <- gsub("antibiotic", "", df_map$Drug.Class.Efflux)
 
   # Select Location
-  df_map_Location <- df_map[df_map$Location == Location,]
+  df_map_Location <- df_map[df_map$Location %in% Location,]
 
   # Matrix for heatmap
   Location_rpkm <- dcast(data = df_map_Location, formula = V1 ~ Sample.name + sample_type, fun.aggregate = sum, value.var = "rpkm")
@@ -50,7 +50,7 @@ createRPKMHeatmap <- function(df_map, Location, col_vector, show_column_names = 
 
   # Create ARG Class labels for row annotations
   args <- row.names(Location_rpkm)
-  drug_class <- sapply(args, function(x) df_map_Location$Drug.Class[df_map_Location$V1 == x[1]][1])
+  drug_class <- sapply(args, function(x) df_map_Location$Drug.Class.Efflux[df_map_Location$V1 == x[1]][1])
 
   # Create heatmap
   set.seed(1)

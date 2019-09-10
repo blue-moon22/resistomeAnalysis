@@ -2,7 +2,6 @@
 #'
 #' @param filename A character vector of the csv
 #' @param without_US_duplicates Logical: If TRUE, includes the US longitudinal data
-#' @param coverage_threshold A numerical value were include only ARGs that have a coverage over the coverage threshold
 #'
 #' @return A dataframe of processed, combined mapping data and metadata
 #'
@@ -13,12 +12,10 @@
 #' @export
 #'
 #' @import dplyr
-readMappingData <- function(filename, without_US_duplicates = TRUE, coverage_threshold = 0.9){
+readMappingData <- function(filename, without_US_duplicates = TRUE){
+
   # Read mapping data
   df_map <- read.csv(filename, stringsAsFactors = FALSE)
-
-  # Filter over by coverage
-  df_map <- df_map[df_map$V7 > coverage_threshold,]
 
   # Create alternative drug class colum where more than 3 ARG classes are multidrug
   countCharOccurrences <- function(char, s) {
@@ -37,26 +34,20 @@ readMappingData <- function(filename, without_US_duplicates = TRUE, coverage_thr
     df_map <- df_map[!(df_map$Visit_Number > 1 & df_map$Country == "US"),]
   }
 
-  # Rename some of the ARGs in V1
-  df_map$V1 <- gsub("ARO:3004039\\|Escherichia", "ARO:3004039\\|Escherichia_coli_emrE", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004043\\|Escherichia", "ARO:3004043\\|Escherichia_coli_acrA", df_map$V1)
-  df_map$V1 <- gsub("ARO:3001328\\|Escherichia", "ARO:3001328\\|Escherichia_coli_mdfA", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004290\\|Escherichia", "ARO:3004290\\|Escherichia_coli_ampC_beta-lactamase", df_map$V1)
-  df_map$V1 <- gsub("ARO:3003730\\|Bifidobacteria", "ARO:3003730\\|Bifidobacterium_ileS_conferring_resistance_to_mupirocin", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004041\\|Klebsiella", "ARO:3004041\\|Klebsiella_pneumoniae_acrA", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004122\\|Klebsiella", "ARO:3004122\\|Klebsiella_pneumoniae_OmpK37", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004454\\|Campylobacter", "ARO:3004454\\|Campylobacter_coli_chloramphenicol_acetyltransferase", df_map$V1)
-  df_map$V1 <- gsub("ARO:3004042\\|Enterobacter", "ARO:3004042\\|Enterobacter_cloacae_acrA", df_map$V1)
-
   # Get total reads per sample and ARG richness
+  df_map$Drug.Class.Efflux <- df_map$Drug.Class
+  df_map$Drug.Class.Efflux[df_map$Resistance.Mechanism == "antibiotic efflux"] <- paste(df_map$Drug.Class.Efflux[df_map$Resistance.Mechanism == "antibiotic efflux"], "(efflux pump)")
+  df_map$ARO.Name[!is.na(df_map$Multi.Efflux.Pump)] <- paste0(df_map$ARO.Name[!is.na(df_map$Multi.Efflux.Pump)], " [", df_map$Multi.Efflux.Role[!is.na(df_map$Multi.Efflux.Pump)], " ", df_map$Multi.Efflux.Pump[!is.na(df_map$Multi.Efflux.Pump)], "]")
+
+  df_map$Prot[!is.na(df_map$Multi.Efflux.Pump)] <- df_map$Multi.Efflux.Pump[!is.na(df_map$Multi.Efflux.Pump)]
   total_reads <- df_map %>%
     group_by(ID, Cohort, sample_type) %>%
-    summarise(total_reads_per_sample = sum(V4), arg_richness = n_distinct(ARO)) %>%
+    summarise(total_reads_per_sample = sum(V4), arg_richness = n_distinct(ARO.Name)) %>%
     ungroup()
   df_map <- left_join(df_map, total_reads, by = c("ID", "Cohort", "sample_type"))
 
   # Calculate RPKM
-  rpkm <- (df_map$V4 * 10^3 * 10*6) / (df_map$total_reads_per_sample * df_map$V3)
+  rpkm <- (df_map$V4 * 10^3 * 10^6) / (df_map$total_reads_per_sample * df_map$V3)
   df_map$rpkm <- rpkm
   df_map$rpkm_log <- log10(df_map$rpkm)
 

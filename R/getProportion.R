@@ -24,8 +24,11 @@ getProportion <- function(df_map, level){
   Location_count$Location_health <- paste(Location_count$Location, Location_count$Health, sep="-")
 
   # Get unique AMR levels e.g. class or mechanism
-  level_names <- unique(unlist(sapply(df_map[[level]], function(x) strsplit(x, ";")[[1]])))
-  level_names <- level_names[level_names != "N/A"] # Remove N/A level name e.g. class name
+  if(level %in% c("Drug.Class", "Resistance.Mechanism")){
+    level_names <- unique(unlist(sapply(df_map[[level]], function(x) strsplit(x, ";")[[1]])))
+  } else {
+    level_names <- unique(df_map[[level]])
+  }
   presence_matrix <- matrix(0, nrow = length(level_names), ncol = nrow(Location_count))
 
   # For each class name, find proportion for each Location
@@ -86,6 +89,7 @@ bootstrap_percentage <- function(df_map, level="Drug.Class", B){
   boot_perc <- matrix(NA, B*length(names), 2)
   individuals <- unique(df_map$ID)
   n <- length(individuals)
+  set.seed(42)
   for(i in 1:B){
     sample_n <- sample(1:n, n, replace=T)
     boot_sample <- df_map[df_map$ID %in% individuals[sample_n],]

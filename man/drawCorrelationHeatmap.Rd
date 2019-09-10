@@ -4,16 +4,17 @@
 \alias{drawCorrelationHeatmap}
 \title{Draws a heatmap from a dataframe of correlated ARGs and taxa}
 \usage{
-drawCorrelationHeatmap(cor_df, bottom_margin, padding = 0, phyla)
+drawCorrelationHeatmap(cor_df, bottom_margin = 0, left_margin = 0,
+  phyla)
 }
 \arguments{
 \item{cor_df}{A dataframe containing correlated ARGs and taxa, rho and adjusted p-values}
 
 \item{bottom_margin}{A numeric value in millimeters for height of column names}
 
-\item{padding}{A numeric value in millimeters for width for row names}
-
 \item{phyla}{A character vector of phyla names for labelling columns of heatmap}
+
+\item{padding}{A numeric value in millimeters for width for row names}
 }
 \value{
 None

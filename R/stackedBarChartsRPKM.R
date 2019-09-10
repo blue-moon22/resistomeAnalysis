@@ -20,17 +20,17 @@ getRelativeAbundance <- function(df_map){
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(Location, sample_type, Drug.Class) %>%
+    group_by(Location, sample_type, Drug.Class.Efflux) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm))
 
   # Extract most abundant ARG classes and label others as Other
   df_map_rel_top <- df_map_rel %>%
-    group_by(Drug.Class) %>%
+    group_by(Drug.Class.Efflux) %>%
     summarise(total_sum_rel_rpkm = sum(sum_scale_rpkm)) %>%
     arrange(desc(total_sum_rel_rpkm)) %>%
-    filter(total_sum_rel_rpkm > 0.5)
-  Drug.Class.Alt <- df_map_rel$Drug.Class
-  Drug.Class.Alt[!Drug.Class.Alt %in% df_map_rel_top$Drug.Class] <- "Other"
+    head(10)
+  Drug.Class.Alt <- df_map_rel$Drug.Class.Efflux
+  Drug.Class.Alt[!Drug.Class.Alt %in% df_map_rel_top$Drug.Class.Efflux] <- "Other"
   df_map_rel$Drug.Class.Alt <- Drug.Class.Alt
   return(df_map_rel)
 }
@@ -88,12 +88,12 @@ getRelativeAbundanceIndividuals <- function(df_map){
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(Location, sample_type, Drug.Class) %>%
+    group_by(Location, sample_type, Drug.Class.Efflux) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm)) %>%
-    group_by(Drug.Class) %>%
+    group_by(Drug.Class.Efflux) %>%
     summarise(total_sum_rel_rpkm = sum(sum_scale_rpkm)) %>%
     arrange(desc(total_sum_rel_rpkm)) %>%
-    filter(total_sum_rel_rpkm > 0.5)
+    head(10)
 
   # Get individual relative abundance
   df_map_rel_ind <- df_map %>%
@@ -102,10 +102,10 @@ getRelativeAbundanceIndividuals <- function(df_map){
     ungroup() %>%
     right_join(df_map) %>%
     mutate(rel_rpkm = rpkm/sum_rpkm) %>%
-    group_by(ID, Location, sample_type, Drug.Class) %>%
+    group_by(ID, Location, sample_type, Drug.Class.Efflux) %>%
     summarise(sum_scale_rpkm = sum(rel_rpkm))
-  Drug.Class.Alt <- df_map_rel_ind$Drug.Class
-  Drug.Class.Alt[!Drug.Class.Alt %in% df_map_rel_top$Drug.Class] <- "Other"
+  Drug.Class.Alt <- df_map_rel_ind$Drug.Class.Efflux
+  Drug.Class.Alt[!Drug.Class.Alt %in% df_map_rel_top$Drug.Class.Efflux] <- "Other"
   df_map_rel_ind$Drug.Class.Alt <- Drug.Class.Alt
 
   return(df_map_rel_ind)

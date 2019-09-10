@@ -5,7 +5,8 @@
 \title{Create a circular graph showing the core ARGs for each ARG Class}
 \usage{
 createCircularGraph(data, by_cohort = FALSE, hjust_val = rep(0,
-  length(unique(data$Drug.Class))), distance_labels = -25)
+  length(unique(data$Drug.Class))), distance_labels = -25,
+  bar_label_size, group_label_size)
 }
 \arguments{
 \item{data}{A dataframe with the percentage of samples that contain each ARG}

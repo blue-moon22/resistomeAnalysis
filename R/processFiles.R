@@ -1,7 +1,7 @@
-#' Combines bedtools mapping data with metadata and CARD data
+#' Combines mapping data with metadata and CARD data
 #'
-#' @param filenames A character vector of bedtools filenames
-#' @param output_file A string of the location of combined bedtools and metadata file
+#' @param filenames A character vector of filenames
+#' @param output_file A string of the location of combined file
 #' @param metadata_file A string of the location of the metadata file
 #' @param card_dir A string of the CARD metadata directory that includes aro_index and aro_categories_index
 #' @param subsampled A boolean stating whether reads were subsampled or not before mapping to CARD
@@ -11,25 +11,26 @@
 #' @export
 #'
 #' @import dplyr purrr
-
 combineBedtools <- function(filenames, output_file, metadata_file, card_dir, subsampled = FALSE) {
 
   # Function to read bedtools file
   readFile <- function(filename){
-    data <- read.delim(filename, header = F, stringsAsFactors = F)
-    data$filename <- filename
-    return(data)
+    if (file.info(filename)$size > 0){
+      data <- read.delim(filename, header = F, stringsAsFactors = F)
+      data$filename <- filename
+      return(data)
+    }
   }
   df_bedtools <- map_df(filenames, function(x) readFile(x))
 
   # Remove no mapping
   df_bedtools <- df_bedtools[df_bedtools$V7 != 0,]
 
-  # Extract ARO for mapping and RGI
+  # Extract ARO for mapping
   df_bedtools$ARO <- gsub("\\|.*", "", gsub(".*ARO:", "", df_bedtools$V1))
 
   # Add IDs
-  ID <- sapply(df_bedtools$filename, function(x) strsplit(x, "/")[[1]][4]) %>%
+  ID <- sapply(df_bedtools$filename, function(x) strsplit(x, "/")[[1]][length(strsplit(x, "/")[[1]])]) %>%
     sapply(function(x) gsub(".bam.bedtools.coverage.txt", "", x))
   if(subsampled){
     seq_num <- sapply(ID, function(x) strsplit(x, "-")[[1]][2]) %>% as.numeric()
@@ -43,6 +44,8 @@ combineBedtools <- function(filenames, output_file, metadata_file, card_dir, sub
   aro_index <- read.delim(paste0(card_dir, "aro_index.csv"), stringsAsFactors = F)
   aro_categories_index <- read.delim(paste0(card_dir, "aro_categories_index.csv"), stringsAsFactors = F)
   aro_index <- left_join(aro_index, aro_categories_index, by = "Protein.Accession")
+  efflux_mech <- read.csv(paste0(card_dir, "efflux_mechanism.csv"), stringsAsFactors = FALSE)
+  aro_index <- left_join(aro_index, efflux_mech, by = c("ARO.Accession", "ARO.Name"))
 
   # Combine raw and metadata
   df_bedtools <- left_join(df_bedtools, metadata, by = "ID")
@@ -55,11 +58,8 @@ combineBedtools <- function(filenames, output_file, metadata_file, card_dir, sub
   # Fill in the gaps
   if (sum(df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)) > 0) {
     df_bedtools$AMR.Gene.Family[df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)] <- "chloramphenicol acetyltransferase (CAT)"
-  }
-  if (sum(df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)) > 0) {
     df_bedtools$Drug.Class[df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)] <- "phenicol antibiotic"
-  }
-  if (sum(df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)) > 0) {
+    df_bedtools$ARO.Name[df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)] <- "cat"
     df_bedtools$Resistance.Mechanism[df_bedtools$ARO == "3002670" & is.na(df_bedtools$Resistance.Mechanism)] <- "antibiotic inactivation"
   }
 

@@ -4,7 +4,7 @@
 \alias{plotVolcano}
 \title{Plot Volcano plots of differential analysis}
 \usage{
-plotVolcano(Location_results, df_map, title, class_colours)
+plotVolcano(Location_results, df_map, title, class_colours, label_size)
 }
 \arguments{
 \item{Location_results}{A dataframe of DESeq2 results for one Location}

@@ -4,15 +4,14 @@
 \alias{runDESeq2}
 \title{Runs differential analysis using DESeq2 for a Location between paired sample types}
 \usage{
-runDESeq2(df_map, Location, compare_samples = c("stool",
-  "dorsum of tongue"))
+runDESeq2(df, Location, compare_samples = c("stool", "dorsum of tongue"))
 }
 \arguments{
-\item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
-
 \item{Location}{A string of a Location that is found in the Location column of df_map}
 
 \item{compare_samples}{A character vector of length two of sample types to compare}
+
+\item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}
 }
 \value{
 A list of length two of a dataframe of DESeq2 results and a character vector of sample types compared in DESeq2

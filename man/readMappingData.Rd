@@ -4,15 +4,12 @@
 \alias{readMappingData}
 \title{Read a csv file of combined mapping data and metadata}
 \usage{
-readMappingData(filename, without_US_duplicates = TRUE,
-  coverage_threshold = 0.9)
+readMappingData(filename, without_US_duplicates = TRUE)
 }
 \arguments{
 \item{filename}{A character vector of the csv}
 
 \item{without_US_duplicates}{Logical: If TRUE, includes the US longitudinal data}
-
-\item{coverage_threshold}{A numerical value were include only ARGs that have a coverage over the coverage threshold}
 }
 \value{
 A dataframe of processed, combined mapping data and metadata

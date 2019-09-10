@@ -26,15 +26,14 @@ getSpearmanCorrelation <- function(data, ids = NA, taxon_level, taxon_ignore){
     data <- data[,names(data) %in% ids]
   }
 
-  data <- data[(grepl("k__Bacteria", row.names(data)) & grepl(paste0(taxon_level, "__"), row.names(data)) & !grepl(paste0(taxon_ignore, "__"), row.names(data))) | grepl("gb", row.names(data)),]
-  data <- data[rowSums(data != 0) > ncol(data)/2,]
-
-  arg_data <- data[!grepl("s__", row.names(data)),]
+  arg_data <- data[!grepl("__", row.names(data)),]
+  arg_data <- arg_data[rowSums(arg_data != 0) > ncol(arg_data)/2,]
+  species_data <- data[grepl(paste0(taxon_level, "__"), row.names(data)) & !grepl(paste0(taxon_ignore, "__"), row.names(data)),]
+  species_data <- species_data[rowSums(species_data != 0) > ncol(species_data)/2,]
   cor_data <- c()
   cor_test <- c()
   x <- c()
   y <- c()
-  species_data <- data[grepl("s__", row.names(data)),]
   # Spearman Correlation p values
   for(i in 1:nrow(species_data)){
     for(j in 1:nrow(arg_data)){
@@ -89,9 +88,8 @@ getSpearmanCorrelation <- function(data, ids = NA, taxon_level, taxon_ignore){
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom circlize colorRamp2
 #' @importFrom grid gpar
-drawCorrelationHeatmap <- function(cor_df, bottom_margin, padding = 0, phyla){
-  cor_df$x <- sapply(as.character(cor_df$x), function(x) strsplit(x, "\\|")[[1]][length(strsplit(x, "\\|")[[1]])])
-  cor_df$y <- sapply(as.character(cor_df$y), function(x) strsplit(x, "\\|")[[1]][length(strsplit(x, "\\|")[[1]])])
+drawCorrelationHeatmap <- function(cor_df, bottom_margin = 0, left_margin = 0, phyla){
+  cor_df <- cor_df[cor_df$rho > 0,]
   sparse_matrix <- dcast(data = cor_df, formula = y ~ x + phylum, fun.aggregate = sum, value.var = "rho")
   row.names(sparse_matrix) <- sparse_matrix$y
   sparse_matrix <- sparse_matrix[,-1]
@@ -117,10 +115,10 @@ drawCorrelationHeatmap <- function(cor_df, bottom_margin, padding = 0, phyla){
   set.seed(42)
   ht <- Heatmap(sparse_matrix, top_annotation = ha, name = "rho", show_row_names = TRUE, cluster_rows = TRUE,
           col = colorRamp2(c(0,1),  c("white", "red")), column_names_max_height = unit(bottom_margin, "mm"),
-          row_title_rot = 0, row_title_gp = gpar(fontsize = 5), show_column_names = TRUE,
+          row_title_rot = 0, row_title_gp = gpar(fontsize = 5), show_column_names = TRUE, row_names_max_width = unit(left_margin, "mm"),
           heatmap_legend_param = list(color_bar = "continuous", title_gp = gpar(fontsize = 20),
                                       labels_gp = gpar(fontsize=16), legend_height = unit(8, "cm")))
-  draw(ht, padding = unit(padding, "mm"))
+  draw(ht)
 }
 
 

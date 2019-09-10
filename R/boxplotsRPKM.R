@@ -20,8 +20,12 @@ createPairedData <- function(df_map, pair_list){
     samples_two <- unique(df_map$Sample.name[df_map$sample_type == pair_list[[i]][2]])
     df_map_pair <- df_map[(df_map$Sample.name %in% Reduce(intersect,list(samples_one, samples_two))) & (df_map$sample_type %in% pair_list[[i]]),]
 
-    df_map_pair <- cbind(df_map_pair, group = paste(pair_list[[i]][1], "vs.", pair_list[[i]][2]))
-    df_map_pairs <- rbind(df_map_pairs, df_map_pair)
+    df_map_pair$group <- paste(pair_list[[i]][1], "vs.", pair_list[[i]][2])
+    if(nrow(df_map_pairs) == 0) {
+      df_map_pairs <- df_map_pair
+    } else {
+      df_map_pairs <- rbind(df_map_pairs, df_map_pair)
+    }
   }
 
   # Order by Location and change characters in group

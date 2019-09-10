@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @import dplyr viridis
-createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, length(unique(data$Drug.Class))), distance_labels = -25){
+createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, length(unique(data$Drug.Class))), distance_labels = -25, bar_label_size, group_label_size){
   # Scale proportion
   if(!by_cohort){
     data$proportion <- data$proportion / length(unique(data$Location))
@@ -99,16 +99,16 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
       axis.text = element_blank(),
       axis.title = element_blank(),
       panel.grid = element_blank(),
-      plot.margin = unit(rep(-1,4), "cm")
+      plot.margin = unit(rep(2,4), "cm")
     ) +
     coord_polar() +
 
     # Add labels on top of each bar
-    geom_text(data=df_labels, aes(x=id, y=tot+10, label=labels, hjust=hjust), color="black", fontface="bold", alpha=0.6, size=3, angle=df_labels$angle, inherit.aes=FALSE) +
+    geom_text(data=df_labels, aes(x=id, y=tot+10, label=labels, hjust=hjust), color="black", fontface="bold", alpha=0.6, size=bar_label_size, angle=df_labels$angle, inherit.aes=FALSE) +
 
     # Add base line information
     geom_segment(data=base_data, aes(x = start, y = -5, xend = end, yend = -5), colour = "black", alpha=0.8, size=0.6, inherit.aes=FALSE) +
-    geom_text(data=base_data, aes(x = title, y = distance_labels, label=Drug.Class), hjust=hjust_val, colour = "black", alpha=0.8, size=3, fontface="bold", inherit.aes = FALSE)
+    geom_text(data=base_data, aes(x = title, y = distance_labels, label=Drug.Class), hjust=hjust_val, colour = "black", alpha=0.8, size=group_label_size, fontface="bold", inherit.aes = FALSE)
 
   return(p)
 }
@@ -124,19 +124,20 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
 #' @export
 #'
 #' @import dplyr tidyr
-drawCoreARGs <- function(data, sample_type, hjust_val) {
-  data_arg <- joinProportionAndBootstrap(data, "V1", sample_type)
-  df_class <- data %>% select(V1, Drug.Class)
-  df_class <- df_class[!(duplicated(df_class$V1)),]
-  data_arg <- left_join(data_arg, df_class, by = c("level" = "V1"))
-  data_arg <- data_arg %>% transform(Drug.Class = strsplit(Drug.Class, ";")) %>% unnest(Drug.Class)
-
-  # Change label names
-  data_arg$labels <- sapply(data_arg$level, function(x) strsplit(x, "\\|")[[1]][length(strsplit(x, "\\|")[[1]])])
+drawCoreARGs <- function(data, sample_type, hjust_val, bar_label_size, group_label_size) {
+  data_arg <- joinProportionAndBootstrap(data, "ARO.Name", sample_type)
+  df_class <- data %>% select(ARO.Name, Drug.Class)
+  df_class <- df_class[!(duplicated(df_class$ARO.Name)),]
+  data_arg <- left_join(data_arg, df_class, by = c("level" = "ARO.Name"))
+  data_arg$labels <- data_arg$level
+  #data_arg <- data_arg %>% transform(Drug.Class = strsplit(Drug.Class, ";")) %>% unnest(Drug.Class)
 
   # Get core
   data_arg <- data_arg[data_arg$proportion >= 70,]
-
-  p <- createCircularGraph(data_arg, by_cohort = TRUE, hjust_val = hjust_val)
+  data_arg$CI_lb95[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
+  data_arg$CI_ub95[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
+  data_arg$CI_ub[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
+  data_arg$CI_lb[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
+  p <- createCircularGraph(data_arg, by_cohort = TRUE, hjust_val = hjust_val, bar_label_size = bar_label_size, group_label_size = group_label_size)
   return(p)
 }

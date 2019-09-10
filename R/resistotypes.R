@@ -28,34 +28,22 @@ runPrincipleCoordinateAnalysis <- function(df_map){
   mds$sample_type <- df_map[!(duplicated(df_map$ID)),]$sample_type
   mds$Location <- df_map[!(duplicated(df_map$ID)),]$Location
   mds$group <- paste(mds$sample_type, mds$Location, sep = " - ")
+
+  set.seed(1)
+  # Hierarchical clustering
+  dst=dist(mds[,!(names(mds) %in% c("sample_type", "Location", "group"))])
+  dst_hclust <- hclust(dst)
+  # Silhoette analysis
+  avg_sil <- numeric(4)
+  for(k in 2:(length(avg_sil)+1)) {
+    tmp <- silhouette(cutree(dst_hclust, k = k), dst)
+    avg_sil[k-1] <- mean(tmp[,3])
+  }
+
+  # Show clusters on MDS
+  mds$clusters <- paste0("R", as.character(cutree(dst_hclust, which.max(avg_sil)+1)))
+
   return(mds)
-}
-
-#' Plot principal coordinates with sample type labels
-#'
-#' @param mds A dataframe of multidimensional scaled coordinates
-#'
-#' @return None
-#'
-#' @examples
-#' df_map <- readMappingData("/home/vicky/Documents/CHMI/Resistome-paper/resistomeAnalysis/db/MAPPING_DATA/nonsubsampled_merged.csv", without_US_duplicates = TRUE)
-#' mds <- runPrincipleCoordinateAnalysis(df_map)
-#' plotSampleTypes(mds)
-#'
-#' @export
-#'
-#' @import ggplot2
-#' @importFrom RColorBrewer brewer.pal
-plotSampleTypes <- function(mds){
-
-  ggplot(mds, aes(V1, V2, color = group)) +
-    geom_point(alpha = 0.6) +
-    xlab("PCo 1") + ylab("PCo 2") +
-    theme(panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          panel.background = element_blank(),
-          axis.line = element_line(colour = "black"))
-
 }
 
 #' Plot principal coordinates with resistotype labels
@@ -76,19 +64,6 @@ plotSampleTypes <- function(mds){
 #' @importFrom RColorBrewer brewer.pal
 plotResistotypes <- function(mds){
 
-  set.seed(42)
-  # Hierarchical clustering
-  dst=dist(mds[,!(names(mds) %in% c("sample_type", "Location", "group"))])
-  dst_hclust <- hclust(dst)
-  # Silhoette analysis
-  avg_sil <- numeric(20)
-  for(k in 2:(length(avg_sil)+1)) {
-    tmp <- silhouette(cutree(dst_hclust, k = k), dst)
-    avg_sil[k-1] <- mean(tmp[,3])
-  }
-
-  # Show clusters on MDS
-  mds$clusters <- paste0("R", as.character(cutree(dst_hclust, 2+which.max(avg_sil[2:length(avg_sil)]))))
   cols <- brewer.pal(length(unique(mds$clusters)), "Dark2")
   ggplot(mds, aes(V1, V2, color = clusters)) +
     geom_point(alpha = 0.6) +

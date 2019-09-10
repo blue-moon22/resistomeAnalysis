@@ -11,8 +11,8 @@
 combineMetaphlanandARG <- function(df_map, metaphlan){
 
   # Create rpkm matrix for PCoA
-  rpkm <- dcast(data = df_map, formula = V1 ~ ID, fun.aggregate = sum, value.var = "rpkm")
-  row.names(rpkm) <- rpkm$V1
+  rpkm <- dcast(data = df_map, formula = ARO.Name ~ ID, fun.aggregate = sum, value.var = "rpkm")
+  row.names(rpkm) <- rpkm$ARO.Name
   rpkm <- rpkm[,-1]
 
   # Samples of metaphlan and args

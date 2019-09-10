@@ -62,6 +62,7 @@ plotMultipleARGRichnessGraphs <- function(ttest_groups, df_map_subsampled_pairs)
 
   df_map_argrich <- df_map_subsampled_pairs[!duplicated(paste0(df_map_subsampled_pairs$ID, df_map_subsampled_pairs$group)),]
   g <- list()
+  set.seed(42)
   for(i in 1:nrow(ttest_groups)){
     df_map_argrich_group <- df_map_argrich[df_map_argrich$Location == ttest_groups$Location[i] & df_map_argrich$group == ttest_groups$group[i],]
     g[[i]] <- ggplot(df_map_argrich_group, aes(sample_type, arg_richness)) +
@@ -70,7 +71,7 @@ plotMultipleARGRichnessGraphs <- function(ttest_groups, df_map_subsampled_pairs)
       theme_classic() +
       ylab("ARG Richness") +
       xlab("") +
-      ylim(c(0, max(df_map_argrich_group$arg_richness) + 20)) +
+      ylim(c(0, max(df_map_argrich$arg_richness) + 20)) +
       ggtitle(paste(ttest_groups[i,]$Location, sep = "\n")) +
       geom_text(data = ttest_groups[i,], aes(label=asterisk),
                 x = 1.5, y = max(df_map_argrich_group$arg_richness)+10, size = 7,
