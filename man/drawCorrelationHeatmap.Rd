@@ -4,8 +4,7 @@
 \alias{drawCorrelationHeatmap}
 \title{Draws a heatmap from a dataframe of correlated ARGs and taxa}
 \usage{
-drawCorrelationHeatmap(cor_df, bottom_margin = 0, left_margin = 0,
-  phyla)
+drawCorrelationHeatmap(cor_df, bottom_margin = 0, left_margin = 0, phyla)
 }
 \arguments{
 \item{cor_df}{A dataframe containing correlated ARGs and taxa, rho and adjusted p-values}

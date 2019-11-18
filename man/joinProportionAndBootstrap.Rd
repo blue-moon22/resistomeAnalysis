@@ -4,8 +4,12 @@
 \alias{joinProportionAndBootstrap}
 \title{Merges dataframes of proportion of samples containing a certain property and confidence intervals of proportions from bootstrapping samples}
 \usage{
-joinProportionAndBootstrap(df_map, level = "Drug.Class",
-  sample_type = "saliva", B = 100)
+joinProportionAndBootstrap(
+  df_map,
+  level = "Drug.Class",
+  sample_type = "saliva",
+  B = 100
+)
 }
 \arguments{
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}

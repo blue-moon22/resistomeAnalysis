@@ -4,8 +4,7 @@
 \alias{createRPKMHeatmap}
 \title{Draws a heatmap from a dataframe of ARG abundance for every sample}
 \usage{
-createRPKMHeatmap(df_map, Location, col_vector,
-  show_column_names = FALSE)
+createRPKMHeatmap(df_map, Location, col_vector, show_column_names = FALSE)
 }
 \arguments{
 \item{df_map}{A dataframe of combined non-subsampled or subsampled mapping data and metadata}

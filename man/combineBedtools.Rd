@@ -4,8 +4,13 @@
 \alias{combineBedtools}
 \title{Combines mapping data with metadata and CARD data}
 \usage{
-combineBedtools(filenames, output_file, metadata_file, card_dir,
-  subsampled = FALSE)
+combineBedtools(
+  filenames,
+  output_file,
+  metadata_file,
+  card_dir,
+  subsampled = FALSE
+)
 }
 \arguments{
 \item{filenames}{A character vector of filenames}

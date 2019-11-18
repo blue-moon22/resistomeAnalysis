@@ -4,8 +4,7 @@
 \alias{drawCoreARGs}
 \title{Draw a circular graph showing the core ARGs for each ARG Class}
 \usage{
-drawCoreARGs(data, sample_type, hjust_val, bar_label_size,
-  group_label_size)
+drawCoreARGs(data, sample_type, hjust_val, bar_label_size, group_label_size)
 }
 \arguments{
 \item{data}{A dataframe of the mapping data}

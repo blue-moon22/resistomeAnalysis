@@ -4,8 +4,13 @@
 \alias{filterBlastOutput}
 \title{Filters blast output file}
 \usage{
-filterBlastOutput(filename, column_names, e_value_filter = NA,
-  identity_filter = NA, min_length_filter = NA)
+filterBlastOutput(
+  filename,
+  column_names,
+  e_value_filter = NA,
+  identity_filter = NA,
+  min_length_filter = NA
+)
 }
 \arguments{
 \item{filename}{A string of the file name}
