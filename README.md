@@ -1,6 +1,6 @@
 # Resistome Analysis
 
-### R version >=3.5.1 recommended
+### R version 3.5.1 recommended
 
 ### Install dependencies in R:
 * dplyr
