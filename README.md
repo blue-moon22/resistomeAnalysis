@@ -24,12 +24,7 @@ install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorB
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
     
-BiocManager::install("DESeq2")
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("ComplexHeatmap")
+BiocManager::install(c("DESeq2", "ComplexHeatmap"))
 ```
 
 ### Install resistomeAnalysis package in R:
