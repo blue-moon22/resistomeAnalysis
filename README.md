@@ -1,7 +1,5 @@
 # Resistome Analysis
 
-### R version 3.5.1 recommended
-
 ### Install dependencies in R:
 * dplyr
 * magrittr
@@ -18,9 +16,20 @@
 * DESeq2
 * ggrepel
 * stringr
+* metafor
 
 ```R
-install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "grid", "vegan", "cluster", "ComplexHeatmap", "circlize", "dendextend", "DESeq2", "ggrepel", "stringr"))
+install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "vegan", "cluster", "circlize", "dendextend", "ggrepel", "stringr", "metafor"))
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+    
+BiocManager::install("DESeq2")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ComplexHeatmap")
 ```
 
 ### Install resistomeAnalysis package in R:
