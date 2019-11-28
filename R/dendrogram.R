@@ -19,10 +19,16 @@
 createUSDendrogram <-  function(df_map_dup, coloured_labels){
   # Select hmp
   df_map_hmp <- df_map_dup[df_map_dup$Location == "US",]
-  df_samples_one <- unique(df_map_hmp$Sample.name[df_map_hmp$Visit_Number == 1])
-  df_samples_two <- unique(df_map_hmp$Sample.name[df_map_hmp$Visit_Number == 2])
-  df_samples_rm <- df_samples_one[!(df_samples_one %in% df_samples_two)]
-  df_map_hmp <- df_map_hmp[!df_map_hmp$Sample.name %in% df_samples_rm,]
+  body_sites <- unique(df_map_hmp$sample_type)
+  for(i in 1:length(body_sites)){
+    df_map_hmp_body_site <- df_map_hmp[df_map_hmp$sample_type == body_sites[i],]
+    df_samples_one <- unique(df_map_hmp_body_site$Sample.name[df_map_hmp_body_site$Visit_Number == 1])
+    df_samples_two <- unique(df_map_hmp_body_site$Sample.name[df_map_hmp_body_site$Visit_Number == 2])
+    df_samples_rm <- df_samples_one[!(df_samples_one %in% df_samples_two)]
+    df_ids_rm <- df_map_hmp_body_site$ID[df_map_hmp_body_site$Sample.name %in% df_samples_rm &
+                                           df_map_hmp_body_site$sample_type == body_sites[i]]
+    df_map_hmp <- df_map_hmp[!(df_map_hmp$ID %in% df_ids_rm),]
+  }
 
   # Matrix for heatmap
   hmp_rpkm <- dcast(data = df_map_hmp, formula = V1 ~ ID + Sample.name + sample_type, fun.aggregate = sum, value.var = "rpkm")
