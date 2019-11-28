@@ -19,7 +19,7 @@
 * metafor
 
 ```R
-install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "vegan", "cluster", "circlize", "phylogram", "ggrepel", "stringr", "metafor"))
+install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "vegan", "cluster", "circlize", "ape", "ggrepel", "stringr", "metafor"))
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
