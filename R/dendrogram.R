@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-#' @import dendextend
+#' @importFrom phylogram as.phylo.dendrogram
 #' @importFrom reshape2 dcast
 createUSDendrogram <-  function(df_map_dup, coloured_labels){
   # Select hmp

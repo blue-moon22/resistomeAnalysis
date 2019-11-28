@@ -12,14 +12,14 @@
 * cluster
 * ComplexHeatmap
 * circlize
-* dendextend
+* phylogram
 * DESeq2
 * ggrepel
 * stringr
 * metafor
 
 ```R
-install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "vegan", "cluster", "circlize", "dendextend", "ggrepel", "stringr", "metafor"))
+install.packages(c("dplyr", "magrittr", "purrr", "reshape2", "ggplot2", "RColorBrewer", "vegan", "cluster", "circlize", "phylogram", "ggrepel", "stringr", "metafor"))
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
