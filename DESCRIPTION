@@ -1,7 +1,7 @@
 Package: resistomeAnalysis
 Type: Package
 Title: Resistome Analysis
-Version: 0.1.0
+Version: 1.0.0
 Author: Victoria Carr
 Maintainer: Victoria Carr <victoria.carr@kcl.ac.uk>
 Description: Analysis used to generate figures for publication

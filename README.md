@@ -12,7 +12,7 @@
 * cluster
 * ComplexHeatmap
 * circlize
-* phylogram
+* ape
 * DESeq2
 * ggrepel
 * stringr

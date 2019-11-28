@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-#' @importFrom phylogram as.phylo.dendrogram
+#' @importFrom ape as.phylo
 #' @importFrom reshape2 dcast
 createUSDendrogram <-  function(df_map_dup, coloured_labels){
   # Select hmp
@@ -52,7 +52,7 @@ createUSDendrogram <-  function(df_map_dup, coloured_labels){
 
   # Draw dendrogram
   par(mar = c(0, 1, 0, 0))
-  plot(as.phylo.dendrogram(hc), type = "fan", tip.color = sample_type_colours, cex = 0.5)
+  plot(as.phylo(hc), type = "fan", tip.color = sample_type_colours, cex = 0.5)
   legend("bottomright", legend = names(coloured_labels), fill = coloured_labels)
 
 }
