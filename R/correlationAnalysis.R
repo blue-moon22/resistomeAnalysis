@@ -105,19 +105,23 @@ drawCorrelationHeatmap <- function(cor_df, bottom_margin = 0, left_margin = 0, p
     names(sparse_matrix) <- gsub(paste0("_", phyla[i]), "", names(sparse_matrix))
   }
   names(phyla_cols) <- phyla_samples
+  row.names(sparse_matrix) <- gsub(" \\[.*", "", row.names(sparse_matrix))
+  colnames(sparse_matrix) <- gsub(" G.*", "", gsub("_", " ", colnames(sparse_matrix)))
 
   ha = HeatmapAnnotation(type = phyla_samples, col = list(type = phyla_cols),
                          annotation_legend_param = list(type = list(title = "Phylum",
                                                                     title_gp = gpar(fontsize = 20),
-                                                                    labels_gp = gpar(fontsize = 16),
-                                                                    grid_height = unit(8, "mm"))))
+                                                                    labels_gp = gpar(fontsize = 16, fontface = "italic"),
+                                                                    grid_height = unit(8, "mm"))),
+                         show_annotation_name = FALSE)
 
   set.seed(42)
   ht <- Heatmap(sparse_matrix, top_annotation = ha, name = "rho", show_row_names = TRUE, cluster_rows = TRUE,
           col = colorRamp2(c(0,1),  c("white", "red")), column_names_max_height = unit(bottom_margin, "mm"),
           row_title_rot = 0, row_title_gp = gpar(fontsize = 5), show_column_names = TRUE, row_names_max_width = unit(left_margin, "mm"),
           heatmap_legend_param = list(color_bar = "continuous", title_gp = gpar(fontsize = 20),
-                                      labels_gp = gpar(fontsize=16), legend_height = unit(8, "cm")))
+                                      labels_gp = gpar(fontsize=16), legend_height = unit(8, "cm")),
+          row_names_gp = gpar(fontface = "italic"), column_names_gp = gpar(fontface = "italic"))
   draw(ht)
 }
 

@@ -4,12 +4,12 @@
 \alias{createUSDendrogram}
 \title{Draws a dendrogram of hierachical clustering of ARG rpkm for longitudinal US samples}
 \usage{
-createUSDendrogram(df_map_dup, coloured_labels)
+createUSDendrogram(df_map_long, coloured_labels)
 }
 \arguments{
-\item{df_map_dup}{A dataframe of combined non-subsampled or subsampled mapping data and metadata, including longitudinal samples}
-
 \item{coloured_labels}{A list of colours named by sample type}
+
+\item{df_map_dup}{A dataframe of combined non-subsampled or subsampled mapping data and metadata, including longitudinal samples}
 }
 \value{
 None

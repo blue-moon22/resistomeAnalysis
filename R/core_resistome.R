@@ -104,7 +104,7 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
     coord_polar() +
 
     # Add labels on top of each bar
-    geom_text(data=df_labels, aes(x=id, y=tot+10, label=labels, hjust=hjust), color="black", fontface="bold", alpha=0.6, size=bar_label_size, angle=df_labels$angle, inherit.aes=FALSE) +
+    geom_text(data=df_labels, aes(x=id, y=tot+10, label=labels, hjust=hjust), color="black", fontface="bold", alpha=0.6, size=bar_label_size, angle=df_labels$angle, inherit.aes=FALSE, parse = TRUE) +
 
     # Add base line information
     geom_segment(data=base_data, aes(x = start, y = -5, xend = end, yend = -5), colour = "black", alpha=0.8, size=0.6, inherit.aes=FALSE) +
@@ -138,6 +138,7 @@ drawCoreARGs <- function(data, sample_type, hjust_val, bar_label_size, group_lab
   data_arg$CI_ub95[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
   data_arg$CI_ub[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
   data_arg$CI_lb[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
+  data_arg$labels <- paste0('italic("', gsub(" \\[.*", "", data_arg$labels), '")')
   p <- createCircularGraph(data_arg, by_cohort = TRUE, hjust_val = hjust_val, bar_label_size = bar_label_size, group_label_size = group_label_size)
   return(p)
 }

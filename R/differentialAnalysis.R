@@ -99,6 +99,9 @@ plotVolcano <- function(Location_results, df_map, title, class_colours, label_si
   # Get class colours
   topT$drug_class <- sapply(row.names(topT), function(x) unique(df_map$Drug.Class_mod[df_map$ARO.Name == x]))
 
+  # Remove proteins in ARG labels
+  topT$ARG <- paste0('italic("', gsub(" \\[.*", "", topT$ARG), '")')
+
   # Volcano plot
   set.seed(42)
   volcano_plot <- ggplot() +
@@ -108,7 +111,7 @@ plotVolcano <- function(Location_results, df_map, title, class_colours, label_si
              aes(log2FoldChange, -log10(padj), color = "red"),
              size = 2, shape = 1, fill = NA) +
   geom_label_repel(data = topT[topT$padj < 0.05 & abs(topT$log2FoldChange) > 2,],
-            aes(x=log2FoldChange, y=-log10(padj), label=ARG, fill = drug_class), size = label_size) +
+            aes(x=log2FoldChange, y=-log10(padj), label=ARG, fill = drug_class), size = label_size, parse = TRUE) +
   xlim(c(-25,25)) +
   ylab("-Log10(adjusted p-value)\n") +
   theme(axis.title = element_text(size=20),
