@@ -48,7 +48,8 @@ createPairedData <- function(df_map, pair_list){
 plotRPKM <- function(df_map_pairs_group){
 
   g <- ggplot(df_map_pairs_group, aes(sample_type, rpkm_log)) +
-    geom_boxplot() +
+    geom_jitter(shape = 4, colour = "grey70", cex = 0.5) +
+    geom_boxplot(colour = "black", alpha = 0) +
     ggtitle(unique(df_map_pairs_group$Location)) +
     theme_classic() +
     theme(strip.text.x = element_blank(),

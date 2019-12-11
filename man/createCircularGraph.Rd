@@ -5,22 +5,21 @@
 \title{Create a circular graph showing the core ARGs for each ARG Class}
 \usage{
 createCircularGraph(
-  data,
-  by_cohort = FALSE,
-  hjust_val = rep(0, length(unique(data$Drug.Class))),
+  data_arg,
+  hjust_val = rep(0, length(unique(data_arg$boot_ci$Drug.Class))),
   distance_labels = -25,
   bar_label_size,
   group_label_size
 )
 }
 \arguments{
-\item{data}{A dataframe with the percentage of samples that contain each ARG}
-
-\item{by_cohort}{A boolean stating whether the bars for each cohort should be side-by-side (TRUE) stacked (FALSE)}
-
 \item{hjust_val}{A numerical vector with the position of the ARG class text for each ARG class}
 
 \item{distance_labels}{A numeric stating distance from the ARG class text and the x-axis}
+
+\item{data}{A dataframe with the percentage of samples that contain each ARG}
+
+\item{by_cohort}{A boolean stating whether the bars for each cohort should be side-by-side (TRUE) stacked (FALSE)}
 }
 \description{
 Create a circular graph showing the core ARGs for each ARG Class

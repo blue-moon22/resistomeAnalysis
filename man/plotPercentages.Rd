@@ -4,7 +4,7 @@
 \alias{plotPercentages}
 \title{Plots a bar chart of the porportions of samples that contain a property for each Location}
 \usage{
-plotPercentages(df_map_pb, colours)
+plotPercentages(df_map_pb, cols)
 }
 \arguments{
 \item{df_map_pb}{A dataframe of proportions and 95\% confidence intervals of samples that contain a unique property for each Location}

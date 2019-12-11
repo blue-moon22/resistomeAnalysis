@@ -4,7 +4,7 @@
 \alias{combineSubsampled}
 \title{Combines proportions and confidence intervals from non-subsampled and equivalent subsampled samples}
 \usage{
-combineSubsampled(df_map, df_map_sub, level, sample_type)
+combineSubsampled(df_map, df_map_sub, level)
 }
 \arguments{
 \item{df_map}{A dataframe of combined non-subsampled mapping data and metadata}
@@ -12,8 +12,6 @@ combineSubsampled(df_map, df_map_sub, level, sample_type)
 \item{df_map_sub}{A dataframe of combined subsampled mapping data and metadata}
 
 \item{level}{A string of a column name e.g. "Drug.Class"}
-
-\item{sample_type}{A string of a sample type e.g. "saliva"}
 }
 \value{
 A dataframe with proportions and confidence intervals from non-subsampled and equivalent subsampled samples

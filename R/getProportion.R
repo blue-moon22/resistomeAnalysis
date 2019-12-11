@@ -98,7 +98,7 @@ bootstrap_percentage <- function(df_map, level="Drug.Class", B){
     boot_perc[(i*length(names) - length(names) + 1):(i*length(names)), 1:2] <- as.matrix(presence_names)
   }
   boot_perc <- data.frame(boot_perc, stringsAsFactors = F)
-  names(boot_perc) <- c("value", "level_names")
+  names(boot_perc) <- c("value", "level")
   boot_perc$value <- as.numeric(boot_perc$value)
   return(boot_perc)
 }
@@ -114,10 +114,11 @@ bootstrap_percentage <- function(df_map, level="Drug.Class", B){
 #' @import dplyr
 bootstrap_CI <- function(bootstrap_percentage_output){
   boot_ci <- bootstrap_percentage_output %>%
-    group_by(level_names) %>%
-    summarise(CI_lb=quantile(value, probs = 0.025),
+    group_by(level) %>%
+    summarise(proportion = mean(value),
+              CI_lb=quantile(value, probs = 0.025),
               CI_ub=quantile(value, probs = 0.975))
-  boot_ci$level_names <- as.character(boot_ci$level_names)
+  boot_ci$level <- as.character(boot_ci$level)
   return(boot_ci)
 }
 
@@ -125,7 +126,6 @@ bootstrap_CI <- function(bootstrap_percentage_output){
 #'
 #' @param df_map A dataframe of combined non-subsampled or subsampled mapping data and metadata
 #' @param level A string of a column name e.g. "Drug.Class"
-#' @param sample_type A string of a sample type e.g. "saliva"
 #' @param B A numerical value of the number of types to sample in bootstrapping
 #'
 #' @return A dataframe of proportions and 95% confidence intervals of samples that contain a unique property for each Location
@@ -137,43 +137,32 @@ bootstrap_CI <- function(bootstrap_percentage_output){
 #' @export
 #'
 #' @importFrom dplyr left_join
-joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", sample_type = "saliva", B = 100){
+joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", B = 100){
 
-  # Filter sample type
-  df_map <- df_map[df_map$sample_type %in% sample_type,]
-
-  # Get proportion of samples
-  prop <- getProportion(df_map, level = level)
-  names(prop) <- c("level", "Location_health", "proportion")
+  # # Get proportion of samples
+  # prop <- getProportion(df_map, level = level)
+  # names(prop) <- c("level", "Location_health", "proportion")
 
   # Bootstrap through countries and health states
   df_map$Location_health <- paste(df_map$Location, df_map$Health, sep="-")
   uniq_Location_health <- unique(df_map$Location_health)
-  boot_ci <- list()
+  boot_ci <- data.frame()
+  boot_perc <- data.frame()
   for(i in 1:length(uniq_Location_health)){
     df_map_filt <- df_map[df_map$Location_health %in% uniq_Location_health[i],]
-    boot_perc <- bootstrap_percentage(df_map_filt, level, B=B)
-    boot_ci[[i]] <- data.frame(bootstrap_CI(boot_perc), Location_health=uniq_Location_health[i])
+    boot_perc_tmp <- bootstrap_percentage(df_map_filt, level, B=B)
+    boot_ci_tmp <- bootstrap_CI(boot_perc_tmp)
+    boot_perc_tmp$Location_health = uniq_Location_health[i]
+    boot_ci_tmp$Location_health = uniq_Location_health[i]
+    boot_perc <- rbind(boot_perc, boot_perc_tmp)
+    boot_ci <- rbind(boot_ci, boot_ci_tmp)
   }
 
-  # Combine CIs
-  boot_ci_comb <- do.call(rbind, boot_ci)
-  boot_names <- names(boot_ci_comb)
-  boot_names[1] <- "level"
-  names(boot_ci_comb) <- boot_names
-
   # Join proportion and bootstrap CIs
-  boot_ci_comb$Location_health <- as.character(boot_ci_comb$Location_health)
-  prop$Location_health <- as.character(prop$Location_health)
-  df_map_join <- left_join(prop, boot_ci_comb, by = c("Location_health", "level"))
+  boot_ci$Location <- gsub("-.*", "", boot_ci$Location_health)
+  boot_perc$Location <- gsub("-.*", "", boot_perc$Location_health)
 
-  # Get the 95% confidence interval
-  df_map_join$CI_lb95 <- df_map_join$CI_lb + (df_map_join$proportion - df_map_join$CI_lb) * 0.05
-  df_map_join$CI_ub95 <- df_map_join$CI_ub - (df_map_join$CI_ub - df_map_join$proportion) * 0.05
-
-  df_map_join$Location <- sapply(df_map_join$Location_health, function(x) strsplit(x, "-")[[1]][1])
-
-  return(df_map_join)
+  return(list(boot_perc = boot_perc, boot_ci = boot_ci))
 }
 
 #' Plots a bar chart of the porportions of samples that contain a property for each Location
@@ -196,16 +185,20 @@ joinProportionAndBootstrap <- function(df_map, level = "Drug.Class", sample_type
 #' @export
 #'
 #' @import ggplot2
-plotPercentages <- function(df_map_pb, colours){
-  ggplot(df_map_pb, aes(level, proportion, ymin = CI_lb95, ymax = CI_ub95, fill = Location)) +
-    geom_bar(stat = "identity", position = "dodge", colour="black") +
-    geom_errorbar(position = position_dodge()) +
+plotPercentages <- function(df_map_pb, cols){
+  ggplot() +
+    geom_bar(data = df_map_pb$boot_ci, mapping = aes(level, proportion, fill = Location),
+             position = "dodge", colour="black", stat = "identity") +
+    geom_point(data = df_map_pb$boot_perc, mapping = aes(level, value, group = Location), shape = 4, position=position_dodge(0.9)) +
     theme(axis.text.x = element_text(angle = 50, hjust = 1, size = 11),
           panel.background = element_blank(),
           axis.line = element_line(colour = "black")) +
     guides(fill=guide_legend(title="Location")) +
-    scale_fill_manual(values = colours) +
-    scale_y_continuous(limits = c(0,100), expand = c(0,0), breaks = seq(0, 100, 10))
+    scale_fill_manual(values = cols) +
+    scale_y_continuous(limits = c(0,100), expand = c(0,0), breaks = seq(0, 100, 10)) +
+    geom_errorbar(data = df_map_pb$boot_ci, mapping = aes(x = level, ymin = CI_lb, ymax = CI_ub, group = Location),
+                  position = position_dodge()) +
+    theme(axis.title=element_text(size=18), legend.text = element_text(size=14), legend.title = element_text(size=18))
 }
 
 #' Combines proportions and confidence intervals from non-subsampled and equivalent subsampled samples
@@ -213,7 +206,6 @@ plotPercentages <- function(df_map_pb, colours){
 #' @param df_map A dataframe of combined non-subsampled mapping data and metadata
 #' @param df_map_sub A dataframe of combined subsampled mapping data and metadata
 #' @param level A string of a column name e.g. "Drug.Class"
-#' @param sample_type A string of a sample type e.g. "saliva"
 #'
 #' @return A dataframe with proportions and confidence intervals from non-subsampled and equivalent subsampled samples
 #'
@@ -224,11 +216,11 @@ plotPercentages <- function(df_map_pb, colours){
 #' df_map_pb_comb <- combineSubsampled(df_map, df_map_sub_saliva, "Drug.Class", "saliva")
 #'
 #' @export
-combineSubsampled <- function(df_map, df_map_sub, level, sample_type){
+combineSubsampled <- function(df_map, df_map_sub, level){
 
   # Joined proportion and bootstrap
-  df_map_pb <- joinProportionAndBootstrap(df_map, level, sample_type)
-  df_map_pb_sub <- joinProportionAndBootstrap(df_map_sub, level, sample_type)
+  df_map_pb <- joinProportionAndBootstrap(df_map, level)
+  df_map_pb_sub <- joinProportionAndBootstrap(df_map_sub, level)
 
   # Combine non-subsampled and subsampled
   df_map_pb_comb <- rbind(data.frame(df_map_pb, subsampled = "non-subsampled"), data.frame(df_map_pb_sub, subsampled = "subsampled"))

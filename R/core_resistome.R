@@ -10,46 +10,42 @@
 #' @export
 #'
 #' @import dplyr viridis
-createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, length(unique(data$Drug.Class))), distance_labels = -25, bar_label_size, group_label_size){
-  # Scale proportion
-  if(!by_cohort){
-    data$proportion <- data$proportion / length(unique(data$Location))
-  }
+createCircularGraph <- function(data_arg, hjust_val = rep(0, length(unique(data_arg$boot_ci$Drug.Class))), distance_labels = -25, bar_label_size, group_label_size){
+
+  data_main <- data_arg$boot_ci
+  data_points <- data_arg$boot_perc
 
   # Set a number of 'empty bar' to add at the end of each group
-  empty_bar=length(unique(data$Location)) - 1
-  nObsType=nlevels(as.factor(data$Location))
-  data$Drug.Class <- as.factor(data$Drug.Class)
-  if(by_cohort){
-    to_add = data.frame( matrix(NA, empty_bar*nlevels(data$Drug.Class), ncol(data)) )
-    colnames(to_add) = colnames(data)
-    to_add$Drug.Class=rep(levels(data$Drug.Class), each=1 )
-  } else {
-    to_add = data.frame( matrix(NA, empty_bar*nlevels(data$Drug.Class)*nObsType, ncol(data)) )
-    colnames(to_add) = colnames(data)
-    to_add$Drug.Class=rep(levels(data$Drug.Class), each=empty_bar*nObsType )
-  }
-  data=rbind(data, to_add)
-  data=data %>% arrange(Drug.Class, level)
-  if(by_cohort){
-    data$id <- seq(1:nrow(data))
-  } else {
-    data$id=rep( seq(1, nrow(data)/nObsType) , each=nObsType)
-  }
+  empty_bar=length(unique(data_main$Location)) - 1
+  nObsType=nlevels(as.factor(data_main$Location))
+  data_main$Drug.Class <- as.factor(data_main$Drug.Class)
+  data_points$Drug.Class <- as.factor(data_points$Drug.Class)
 
-  # Get the name and the y position of each label
-  if(by_cohort){
-    df_labels= data %>% group_by(id, level, Location, labels) %>% summarize(tot=sum(CI_ub95))
-  } else {
-    df_labels= data %>% group_by(id, level, labels) %>% summarize(tot=sum(proportion))
-  }
+  to_add = data.frame( matrix(NA, empty_bar*nlevels(data_main$Drug.Class), ncol(data_main)) )
+  colnames(to_add) = colnames(data_main)
+  to_add$Drug.Class=rep(levels(data_main$Drug.Class), each=1 )
+
+  data_main=rbind(data_main, to_add)
+  data_main=data_main %>% arrange(Drug.Class, level)
+  data_main$id <- seq(1:nrow(data_main))
+
+  to_add = data.frame( matrix(NA, empty_bar*nlevels(data_points$Drug.Class), ncol(data_points)) )
+  colnames(to_add) <- colnames(data_points)
+  to_add$Drug.Class=rep(levels(data_points$Drug.Class), each=1 )
+
+  data_points <- rbind(data_points, to_add)
+  data_points <- data_points %>% arrange(Drug.Class, level)
+  data_points <- left_join(data_points, data_main, by = c("Drug.Class", "level", "Location_health", "Location")) %>%
+    select(c("value", "Drug.Class", "level", "Location_health", "Location", "id"))
+
+  df_labels= data_main %>% group_by(id, level, Location, labels) %>% summarize(tot=sum(CI_ub))
   number_of_bar=nrow(df_labels)
   angle= 90 - 360 * (df_labels$id-0.5) /number_of_bar     # I substract 0.5 because the letter must have the angle of the center of the bars. Not extreme right(1) or extreme left (0)
   df_labels$hjust<-ifelse( angle < -90, 1, 0)
   df_labels$angle<-ifelse(angle < -90, angle+180, angle)
 
   # prepare a data frame for base lines
-  base_data=data %>%
+  base_data=data_main %>%
     group_by(Drug.Class) %>%
     summarize(start=min(id), end=max(id) - empty_bar) %>%
     rowwise() %>%
@@ -72,16 +68,13 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
   grid_data$end[log] <- grid_data$end[log] + 0.5
 
   # Core resistome across healthy individuals across countries
-  if(by_cohort){
-    p <- ggplot(data, aes(x=as.factor(id), y=proportion, fill = Location, ymin = CI_lb95, ymax = CI_ub95)) +
-      geom_bar(stat = "identity", position = "dodge", alpha=0.5)
-  } else {
-    p <- ggplot(data, aes(x=as.factor(id), y=proportion, fill = Location)) +
-      geom_bar(stat = "identity", alpha=0.5)
-  }
-  p <- p +
-    geom_errorbar(position = position_dodge()) +
-    scale_fill_viridis(discrete=TRUE, breaks = sort(unique(data$Location[!is.na(data$Location)])))  +
+  p <- ggplot() +
+    geom_bar(data = data_main, mapping = aes(x=as.factor(id), y=proportion, fill = Location),
+             stat = "identity", position = "dodge", alpha=0.5) +
+    geom_errorbar(data = data_main, mapping = aes(x = as.factor(id), ymin = CI_lb, ymax = CI_ub, group = Location),
+                  position = position_dodge(), colour = "blue") +
+    geom_point(data = data_points, mapping = aes(x=as.factor(id), y = value, group = Location), shape = 4, position=position_dodge(0.9)) +
+    scale_fill_viridis(discrete=TRUE, breaks = sort(unique(data_main$Location[!is.na(data_main$Location)])))  +
 
     # Add a val=100/75/50/25 lines. I do it at the beginning to make sur barplots are OVER it.
     geom_segment(data=grid_data, aes(x = end, y = 80, xend = start, yend = 80), colour = "grey", alpha=1, size=0.3 , inherit.aes = FALSE ) +
@@ -116,7 +109,6 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
 #' Draw a circular graph showing the core ARGs for each ARG Class
 #'
 #' @param data A dataframe of the mapping data
-#' @param sample_type A string stating the sample type e.g. "saliva"
 #' @param hjust_val A numerical vector with the position of the ARG class text for each ARG class
 #'
 #' @examples
@@ -124,21 +116,23 @@ createCircularGraph <- function(data, by_cohort = FALSE, hjust_val = rep(0, leng
 #' @export
 #'
 #' @import dplyr tidyr
-drawCoreARGs <- function(data, sample_type, hjust_val, bar_label_size, group_label_size) {
-  data_arg <- joinProportionAndBootstrap(data, "ARO.Name", sample_type)
+drawCoreARGs <- function(data, hjust_val, bar_label_size, group_label_size, B = 100) {
+  data_arg <- joinProportionAndBootstrap(data, "ARO.Name", B)
   df_class <- data %>% select(ARO.Name, Drug.Class)
   df_class <- df_class[!(duplicated(df_class$ARO.Name)),]
-  data_arg <- left_join(data_arg, df_class, by = c("level" = "ARO.Name"))
-  data_arg$labels <- data_arg$level
+  data_arg$boot_ci <- left_join(data_arg$boot_ci, df_class, by = c("level" = "ARO.Name"))
+  data_arg$boot_perc <- left_join(data_arg$boot_perc, df_class, by = c("level" = "ARO.Name"))
+  data_arg$boot_ci$labels <- data_arg$boot_ci$level
   #data_arg <- data_arg %>% transform(Drug.Class = strsplit(Drug.Class, ";")) %>% unnest(Drug.Class)
 
   # Get core
-  data_arg <- data_arg[data_arg$proportion >= 70,]
-  data_arg$CI_lb95[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
-  data_arg$CI_ub95[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
-  data_arg$CI_ub[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
-  data_arg$CI_lb[is.na(data_arg$CI_lb)] <- data_arg$proportion[is.na(data_arg$CI_lb)]
-  data_arg$labels <- paste0('italic("', gsub(" \\[.*", "", data_arg$labels), '")')
-  p <- createCircularGraph(data_arg, by_cohort = TRUE, hjust_val = hjust_val, bar_label_size = bar_label_size, group_label_size = group_label_size)
+  data_arg$boot_ci <- data_arg$boot_ci[data_arg$boot_ci$proportion >= 70,]
+  data_arg$boot_ci$CI_lb[is.na(data_arg$boot_ci$CI_lb)] <- data_arg$boot_ci$proportion[is.na(data_arg$boot_ci$CI_lb)]
+  data_arg$boot_ci$CI_ub[is.na(data_arg$boot_ci$CI_lb)] <- data_arg$boot_ci$proportion[is.na(data_arg$boot_ci$CI_lb)]
+  data_arg$boot_ci$labels <- paste0('italic("', gsub(" \\[.*", "", data_arg$boot_ci$labels), '")')
+
+  data_arg$boot_perc <- data_arg$boot_perc[paste(data_arg$boot_perc$level, data_arg$boot_perc$Location) %in% paste(data_arg$boot_ci$level, data_arg$boot_ci$Location),]
+
+  p <- createCircularGraph(data_arg, hjust_val = hjust_val, bar_label_size = bar_label_size, group_label_size = group_label_size)
   return(p)
 }
