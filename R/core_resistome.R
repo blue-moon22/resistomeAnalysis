@@ -110,6 +110,9 @@ createCircularGraph <- function(data_arg, hjust_val = rep(0, length(unique(data_
 #'
 #' @param data A dataframe of the mapping data
 #' @param hjust_val A numerical vector with the position of the ARG class text for each ARG class
+#' @bar_label_size Text size of bar label
+#' @group_label_size Text size of group label
+#' @B A numerical value of the number of types to sample in bootstrapping
 #'
 #' @examples
 #'
